@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Primitives/Sphere.hpp"
+#include "Primitives/Primitive.hpp"
 
 class Scene
 {
 public:
     Scene() = default;
 
-    template <typename T, typename... Args>
-        requires std::is_same_v<T, Sphere> && std::is_constructible_v<T, Args...>
+    template <Primitive T, typename... Args>
+        requires std::is_constructible_v<T, Args...>
     void Push(Args&&... args)
     {
         if constexpr (std::is_same_v<T, Sphere>) {

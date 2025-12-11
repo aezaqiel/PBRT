@@ -21,7 +21,8 @@ add_executable(${PROJECT_NAME}
     src/Containers/Interval.hpp
     src/Containers/Interval.cpp
 
-    src/Primitives/Hittable.hpp
+    src/Primitives/Primitive.hpp
+    src/Primitives/HitRecord.hpp
     src/Primitives/Sphere.hpp
     src/Primitives/Sphere.cpp
 

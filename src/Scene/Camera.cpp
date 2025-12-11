@@ -37,7 +37,7 @@ std::vector<glm::vec3> Camera::Render(const Scene& scene)
     }
 	std::clog << "\rDone                                             " << std::endl;
 
-    return std::move(buffer);
+    return buffer;
 }
 
 glm::vec3 Camera::RayColor(const Ray& ray, const Scene& scene)

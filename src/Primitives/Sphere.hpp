@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Hittable.hpp"
+#include "HitRecord.hpp"
 #include "Containers/Interval.hpp"
 
 class Sphere
