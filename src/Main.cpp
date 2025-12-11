@@ -22,8 +22,8 @@ namespace {
 
 int main()
 {
-    constexpr usize IMAGE_WIDTH = 1280;
-    constexpr usize IMAGE_HEIGHT = 720;
+    constexpr usize IMAGE_WIDTH = 400;
+    constexpr usize IMAGE_HEIGHT = 300;
     constexpr usize SAMPLES = 64;
     constexpr usize DEPTH = 8;
 
@@ -63,6 +63,6 @@ int main()
   	if (stbi_write_png(outputFile.c_str(), IMAGE_WIDTH, IMAGE_HEIGHT, 3, image.data(), IMAGE_WIDTH * 3)) {
 		std::println("Image saved to {}", outputFile);
 	} else {
-		std::println("Failed to save image");
+		std::println(std::cerr, "Failed to save image");
 	}
 }

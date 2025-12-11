@@ -16,6 +16,7 @@ public:
     std::vector<glm::vec3> Render(usize samples, usize depth);
 
 private:
+    Ray GetRay(usize i, usize j);
     glm::vec3 RayColor(const Ray& ray);
 
 private:
