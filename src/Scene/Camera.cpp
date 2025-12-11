@@ -57,7 +57,7 @@ std::vector<glm::vec3> Camera::Render(usize samples, usize depth)
 
             for (usize s = 0; s < samples; ++s) {
                 Ray ray = GetRay(i, j);
-                color += RayColor(ray);
+                color += RayColor(ray, depth);
             }
 
             color /= static_cast<f32>(samples);
@@ -77,11 +77,11 @@ Ray Camera::GetRay(usize i, usize j)
     return Ray(m_Center, pixelSample - m_Center);
 }
 
-glm::vec3 Camera::RayColor(const Ray& ray)
+glm::vec3 Camera::RayColor(const Ray& ray, usize depth)
 {
     HitRecord record;
     if (m_Scene->Hit(ray, m_Clip, record)) {
-        return 0.5f * (record.normal + 1.0f);
+        return 0.5f * RayColor(Ray(record.p, record.normal), depth - 1);
     }
 
     // Skybox
