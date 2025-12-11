@@ -15,19 +15,24 @@ struct Interval
     {
     }
 
-    inline f32 size() const
+    inline f32 Size() const
     {
         return max - min;
     }
 
-    inline bool contains(f32 x) const
+    inline bool Contains(f32 x) const
     {
         return min <= x && x <= max;
     }
 
-    inline bool surrounds(f32 x) const
+    inline bool Surrounds(f32 x) const
     {
         return min < x && x < max;
+    }
+
+    inline f32 Clamp(f32 x) const
+    {
+        return std::clamp(x, min, max);
     }
 
     static const Interval empty;

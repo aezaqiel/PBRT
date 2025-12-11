@@ -23,9 +23,9 @@ bool Sphere::Hit(const Ray& ray, Interval t, HitRecord& record) const
 
     f32 root = (-halfB - sqrtd) / a;
 
-    if (!t.surrounds(root)) {
+    if (!t.Surrounds(root)) {
         root = (-halfB + sqrtd) / a;
-        if (!t.surrounds(root)) {
+        if (!t.Surrounds(root)) {
             return false;
         }
     }
