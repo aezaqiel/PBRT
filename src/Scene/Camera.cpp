@@ -26,10 +26,10 @@ Camera::Camera(usize width, usize height, f32 near, f32 far)
 
 std::vector<glm::vec3> Camera::Render(usize samples, usize depth)
 {
-    std::println(std::clog, "Rendering:");
-    std::println(std::clog, " - Resolution: {}, {}", m_Width, m_Height);
-    std::println(std::clog, " - Samples: {}", samples);
-    std::println(std::clog, " - Depth: {}", depth);
+    std::println("Rendering:");
+    std::println(" - Resolution: {}, {}", m_Width, m_Height);
+    std::println(" - Samples: {}", samples);
+    std::println(" - Depth: {}", depth);
 
     std::vector<glm::vec3> buffer(m_Width * m_Height, glm::vec3(0.0f));
 

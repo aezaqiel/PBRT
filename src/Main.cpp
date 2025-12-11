@@ -33,10 +33,15 @@ int main()
 
 	std::unique_ptr<Scene> scene = std::make_unique<Scene>();
 
-	MaterialHandle lamb = scene->CreateMaterial<Lambertian>(glm::vec3(0.8f, 0.2f, 0.8f));
+	auto ground = scene->CreateMaterial<Lambertian>(glm::vec3(0.8f, 0.8f, 0.0f));
+	auto center = scene->CreateMaterial<Lambertian>(glm::vec3(0.1f, 0.2f, 0.5f));
+	auto left = scene->CreateMaterial<Metal>(glm::vec3(0.8f, 0.8f, 0.8f));
+	auto right = scene->CreateMaterial<Metal>(glm::vec3(0.8f, 0.6f, 0.2f));
 
-	scene->Push<Sphere>(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f, lamb);
-	scene->Push<Sphere>(glm::vec3(0.0f, -100.5f, -1.0f), 100.0f);
+	scene->Push<Sphere>(glm::vec3( 0.0f, -100.5f, -1.0f), 100.0f, ground);
+	scene->Push<Sphere>(glm::vec3( 0.0f,    0.0f, -1.2f), 0.5f, center);
+	scene->Push<Sphere>(glm::vec3(-1.0f,    0.0f, -1.0f), 0.5f, left);
+	scene->Push<Sphere>(glm::vec3( 1.0f,    0.0f, -1.0f), 0.5f, right);
 
 	std::unique_ptr<Camera> camera = std::make_unique<Camera>(
 		IMAGE_WIDTH, IMAGE_HEIGHT,

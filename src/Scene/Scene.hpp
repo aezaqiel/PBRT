@@ -12,13 +12,13 @@ public:
         requires std::constructible_from<T, Args...>
     inline MaterialHandle CreateMaterial(Args&&... args)
     {
-        m_Materials.emplace_back(std::forward<Args>(args)...);
+        m_Materials.emplace_back(T(std::forward<Args>(args)...));
         return MaterialHandle { m_Materials.size() - 1 };
     }
 
     inline const MaterialVariant& GetMaterial(MaterialHandle handle) const
     {
-        return m_Materials.at(handle.index);
+        return m_Materials[handle.index];
     }
 
     template <Primitive T, typename... Args>

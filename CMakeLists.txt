@@ -39,6 +39,8 @@ add_executable(${PROJECT_NAME}
     src/Materials/Material.hpp
     src/Materials/Lambertian.hpp
     src/Materials/Lambertian.cpp
+    src/Materials/Metal.hpp
+    src/Materials/Metal.cpp
 
     src/Scene/Camera.hpp
     src/Scene/Camera.cpp
