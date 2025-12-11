@@ -14,11 +14,14 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_executable(${PROJECT_NAME}
     src/Main.cpp
     src/Types.hpp
+
+    src/Platform/STBImpl.cpp
 )
 
 target_include_directories(${PROJECT_NAME}
 PRIVATE
     src
+    thirdparty/stb
 )
 
 target_compile_definitions(${PROJECT_NAME}
