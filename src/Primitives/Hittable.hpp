@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Containers/Ray.hpp"
-#include "Containers/Interval.hpp"
 
 struct HitRecord
 {
@@ -15,11 +14,4 @@ struct HitRecord
         frontFace = glm::dot(ray.direction, outNormal) < 0.0f;
         normal = frontFace ? outNormal : -outNormal;
     }
-};
-
-class Hittable
-{
-public:
-    virtual ~Hittable() = default;
-    virtual bool Hit(const Ray& ray, Interval t, HitRecord& record) const = 0;
 };

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Geometry/Hittable.hpp"
+#include "Scene.hpp"
 
 class Camera
 {
@@ -8,10 +8,10 @@ public:
     Camera(usize width, usize height, f32 near, f32 far);
     ~Camera() = default;
 
-    std::vector<glm::vec3> Render(const Hittable& scene);
+    std::vector<glm::vec3> Render(const Scene& scene);
 
 private:
-    glm::vec3 RayColor(const Ray& ray, const Hittable& scene);
+    glm::vec3 RayColor(const Ray& ray, const Scene& scene);
 
 private:
     usize m_Width;

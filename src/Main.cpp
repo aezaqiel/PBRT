@@ -1,9 +1,7 @@
 #include <stb_image_write.h>
 
-#include "Geometry/HittableList.hpp"
-#include "Geometry/Sphere.hpp"
-
-#include "Camera.hpp"
+#include "Scene/Scene.hpp"
+#include "Scene/Camera.hpp"
 
 namespace {
 
@@ -29,9 +27,9 @@ int main()
 
 	constexpr f32 INV_GAMMA = 1.0f / 2.2f;
 
-	HittableList scene;
-	scene.Push(std::make_shared<Sphere>(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f));
-	scene.Push(std::make_shared<Sphere>(glm::vec3(0.0f, -100.5f, -1.0f), 100.0f));
+	Scene scene;
+	scene.Push<Sphere>(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f);
+	scene.Push<Sphere>(glm::vec3(0.0f, -100.5f, -1.0f), 100.0f);
 
 	Camera camera(IMAGE_WIDTH, IMAGE_HEIGHT, 0.0001f, std::numeric_limits<f32>::infinity());
 

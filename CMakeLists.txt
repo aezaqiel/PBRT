@@ -17,18 +17,18 @@ add_executable(${PROJECT_NAME}
     src/Main.cpp
     src/Types.hpp
 
-    src/Camera.hpp
-    src/Camera.cpp
-
     src/Containers/Ray.hpp
     src/Containers/Interval.hpp
     src/Containers/Interval.cpp
 
-    src/Geometry/Hittable.hpp
-    src/Geometry/HittableList.hpp
-    src/Geometry/HittableList.cpp
-    src/Geometry/Sphere.hpp
-    src/Geometry/Sphere.cpp
+    src/Primitives/Hittable.hpp
+    src/Primitives/Sphere.hpp
+    src/Primitives/Sphere.cpp
+
+    src/Scene/Camera.hpp
+    src/Scene/Camera.cpp
+    src/Scene/Scene.hpp
+    src/Scene/Scene.cpp
 
     src/Platform/STBImpl.cpp
 )

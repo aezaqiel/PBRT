@@ -1,14 +1,15 @@
 #pragma once
 
 #include "Hittable.hpp"
+#include "Containers/Interval.hpp"
 
-class Sphere final : public Hittable
+class Sphere
 {
 public:
     Sphere(const glm::vec3& center, f32 radius);
-    virtual ~Sphere() = default;
+    ~Sphere() = default;
 
-    virtual bool Hit(const Ray& ray, Interval t, HitRecord& record) const override;
+    bool Hit(const Ray& ray, Interval t, HitRecord& record) const;
 
 private:
     glm::vec3 m_Center;

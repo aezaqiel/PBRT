@@ -22,7 +22,7 @@ Camera::Camera(usize width, usize height, f32 near, f32 far)
 	m_Pixel00Loc = viewportUpperLeft + 0.5f * (m_PixelDeltaU + m_PixelDeltaV);
 }
 
-std::vector<glm::vec3> Camera::Render(const Hittable& scene)
+std::vector<glm::vec3> Camera::Render(const Scene& scene)
 {
     std::vector<glm::vec3> buffer(m_Width * m_Height, glm::vec3(0.0f));
 
@@ -40,7 +40,7 @@ std::vector<glm::vec3> Camera::Render(const Hittable& scene)
     return std::move(buffer);
 }
 
-glm::vec3 Camera::RayColor(const Ray& ray, const Hittable& scene)
+glm::vec3 Camera::RayColor(const Ray& ray, const Scene& scene)
 {
     HitRecord record;
     if (scene.Hit(ray, m_Clip, record)) {
