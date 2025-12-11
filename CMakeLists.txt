@@ -17,6 +17,9 @@ add_executable(${PROJECT_NAME}
     src/Main.cpp
     src/Types.hpp
 
+    src/Camera.hpp
+    src/Camera.cpp
+
     src/Containers/Ray.hpp
     src/Containers/Interval.hpp
     src/Containers/Interval.cpp
