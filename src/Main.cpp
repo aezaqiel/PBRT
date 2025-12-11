@@ -31,13 +31,18 @@ int main()
 
 	std::string outputFile = (std::filesystem::path(PathConfig::OutputDir) / "image.png").string();
 
-	Scene scene;
-	scene.Push<Sphere>(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f);
-	scene.Push<Sphere>(glm::vec3(0.0f, -100.5f, -1.0f), 100.0f);
+	std::unique_ptr<Scene> scene = std::make_unique<Scene>();
+	scene->Push<Sphere>(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f);
+	scene->Push<Sphere>(glm::vec3(0.0f, -100.5f, -1.0f), 100.0f);
 
-	Camera camera(IMAGE_WIDTH, IMAGE_HEIGHT, 0.0001f, std::numeric_limits<f32>::infinity());
+	std::unique_ptr<Camera> camera = std::make_unique<Camera>(
+		IMAGE_WIDTH, IMAGE_HEIGHT,
+		0.0001f, std::numeric_limits<f32>::infinity()
+	);
 
-	std::vector<glm::vec3> buffer = camera.Render(scene);
+	camera->SetScene(scene.get());
+
+	std::vector<glm::vec3> buffer = camera->Render(SAMPLES, DEPTH);
 
 	std::vector<u8> image(buffer.size() * 3);
 

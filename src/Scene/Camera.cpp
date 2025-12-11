@@ -22,16 +22,21 @@ Camera::Camera(usize width, usize height, f32 near, f32 far)
 	m_Pixel00Loc = viewportUpperLeft + 0.5f * (m_PixelDeltaU + m_PixelDeltaV);
 }
 
-std::vector<glm::vec3> Camera::Render(const Scene& scene)
+std::vector<glm::vec3> Camera::Render(usize samples, usize depth)
 {
     std::vector<glm::vec3> buffer(m_Width * m_Height, glm::vec3(0.0f));
+
+    if (!m_Scene) {
+        std::println("Scene not set...");
+        return buffer;
+    }
 
     for (usize j = 0; j < m_Height; ++j) {
 		std::clog << "\rScanlines remaining: " << (m_Height - 1) << ' ' << std::flush;
         for (usize i = 0; i < m_Width; ++i) {
             glm::vec3 pixel = m_Pixel00Loc + (static_cast<f32>(i) * m_PixelDeltaU) + (static_cast<f32>(j) * m_PixelDeltaV);
 
-            glm::vec3 color = RayColor(Ray(m_Center, pixel - m_Center), scene);
+            glm::vec3 color = RayColor(Ray(m_Center, pixel - m_Center));
             buffer[i + j * m_Width] = color;
         }
     }
@@ -40,10 +45,10 @@ std::vector<glm::vec3> Camera::Render(const Scene& scene)
     return buffer;
 }
 
-glm::vec3 Camera::RayColor(const Ray& ray, const Scene& scene)
+glm::vec3 Camera::RayColor(const Ray& ray)
 {
     HitRecord record;
-    if (scene.Hit(ray, m_Clip, record)) {
+    if (m_Scene->Hit(ray, m_Clip, record)) {
         return 0.5f * (record.normal + 1.0f);
     }
 
