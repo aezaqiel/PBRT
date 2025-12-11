@@ -14,3 +14,12 @@ using f32 = float;
 using f64 = double;
 
 using usize = size_t;
+
+template <typename T, typename Variant>
+struct IsVariantMember;
+
+template <typename T, typename... Ts>
+struct IsVariantMember<T, std::variant<Ts...>>
+    : std::disjunction<std::is_same<T, Ts>...>
+{
+};

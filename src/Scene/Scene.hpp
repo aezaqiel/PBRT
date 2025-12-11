@@ -8,20 +8,22 @@ class Scene
 public:
     Scene();
 
-    inline usize AddMaterial(const Material& material)
+    template <Material T, typename... Args>
+        requires std::constructible_from<T, Args...>
+    inline MaterialHandle CreateMaterial(Args&&... args)
     {
-        m_Materials.push_back(material);
-        return m_Materials.size() - 1;
+        m_Materials.emplace_back(std::forward<Args>(args)...);
+        return MaterialHandle { m_Materials.size() - 1 };
     }
 
-    inline const Material& GetMaterial(usize index) const
+    inline const MaterialVariant& GetMaterial(MaterialHandle handle) const
     {
-        return m_Materials.at(index);
+        return m_Materials.at(handle.index);
     }
 
     template <Primitive T, typename... Args>
         requires std::is_constructible_v<T, Args...>
-    void Push(Args&&... args)
+    inline void Push(Args&&... args)
     {
         if constexpr (std::is_same_v<T, Sphere>) {
             m_Spheres.emplace_back(std::forward<Args>(args)...);
@@ -31,6 +33,6 @@ public:
     bool Hit(const Ray& ray, Interval clip, HitRecord& record) const;
 
 private:
-    std::vector<Material> m_Materials;
+    std::vector<MaterialVariant> m_Materials;
     std::vector<Sphere> m_Spheres;
 };

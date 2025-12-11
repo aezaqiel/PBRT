@@ -2,16 +2,17 @@
 
 #include "Primitives/HitRecord.hpp"
 
-enum class MaterialType : u8
+#include "Lambertian.hpp"
+
+template <typename T>
+concept Scatterable = requires(const T& t, const Ray& r, const HitRecord& rec, glm::vec3& att, Ray& scat)
 {
-    None,
+    { t.Scatter(r, rec, att, scat) } -> std::convertible_to<bool>;
+};
+
+using MaterialVariant = std::variant<
     Lambertian
-};
+>;
 
-struct Material
-{
-    MaterialType type { MaterialType::None };
-    glm::vec3 albedo { 0.0f };
-
-    bool Scatter(const Ray& ray, const HitRecord& record, glm::vec3& attenuation, Ray& scattered) const;
-};
+template <typename T>
+concept Material = IsVariantMember<T, MaterialVariant>::value && Scatterable<T>;

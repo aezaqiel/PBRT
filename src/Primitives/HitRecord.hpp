@@ -2,6 +2,17 @@
 
 #include "Containers/Ray.hpp"
 
+struct MaterialHandle
+{
+    // 0 index should be the default material
+    usize index { 0 };
+
+    MaterialHandle(usize index = 0)
+        : index(index)
+    {
+    }
+};
+
 struct HitRecord
 {
     glm::vec3 p;
@@ -9,7 +20,7 @@ struct HitRecord
     f32 t;
     bool frontFace;
 
-    usize material;
+    MaterialHandle material;
 
     void SetFace(const Ray& ray, const glm::vec3& outNormal)
     {

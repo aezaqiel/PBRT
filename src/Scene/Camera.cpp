@@ -89,8 +89,11 @@ glm::vec3 Camera::RayColor(const Ray& ray, usize depth)
         glm::vec3 attenuation;
         Ray scattered;
 
-        const auto& material = m_Scene->GetMaterial(record.material);
-        if (material.Scatter(ray, record, attenuation, scattered)) {
+        bool scatter = std::visit([&](const auto& mat) -> bool {
+            return mat.Scatter(ray, record, attenuation, scattered);
+        }, m_Scene->GetMaterial(record.material));
+
+        if (scatter) {
             return attenuation * RayColor(scattered, depth - 1);
         }
 

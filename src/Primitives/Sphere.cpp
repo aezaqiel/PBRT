@@ -1,6 +1,6 @@
 #include "Sphere.hpp"
 
-Sphere::Sphere(const glm::vec3& center, f32 radius, usize material)
+Sphere::Sphere(const glm::vec3& center, f32 radius, MaterialHandle material)
     : m_Center(center), m_Radius(std::fmax(0.0f, radius)), m_Material(material)
 {
 }
