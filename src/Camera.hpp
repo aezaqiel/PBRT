@@ -8,7 +8,7 @@ public:
     Camera(usize width, usize height, f32 near, f32 far);
     ~Camera() = default;
 
-    std::vector<f32> Render(const Hittable& scene);
+    std::vector<glm::vec3> Render(const Hittable& scene);
 
 private:
     glm::vec3 RayColor(const Ray& ray, const Hittable& scene);

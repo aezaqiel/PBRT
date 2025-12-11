@@ -22,9 +22,9 @@ Camera::Camera(usize width, usize height, f32 near, f32 far)
 	m_Pixel00Loc = viewportUpperLeft + 0.5f * (m_PixelDeltaU + m_PixelDeltaV);
 }
 
-std::vector<f32> Camera::Render(const Hittable& scene)
+std::vector<glm::vec3> Camera::Render(const Hittable& scene)
 {
-    std::vector<f32> buffer(m_Width * m_Height * 3, 0.0f);
+    std::vector<glm::vec3> buffer(m_Width * m_Height, glm::vec3(0.0f));
 
     for (usize j = 0; j < m_Height; ++j) {
 		std::clog << "\rScanlines remaining: " << (m_Height - 1) << ' ' << std::flush;
@@ -32,12 +32,7 @@ std::vector<f32> Camera::Render(const Hittable& scene)
             glm::vec3 pixel = m_Pixel00Loc + (static_cast<f32>(i) * m_PixelDeltaU) + (static_cast<f32>(j) * m_PixelDeltaV);
 
             glm::vec3 color = RayColor(Ray(m_Center, pixel - m_Center), scene);
-
-            usize index = (i + j * m_Width) * 3;
-
-            buffer[index + 0] = color.r;
-            buffer[index + 1] = color.g;
-            buffer[index + 2] = color.b;
+            buffer[i + j * m_Width] = color;
         }
     }
 	std::clog << "\rDone                                             " << std::endl;
