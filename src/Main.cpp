@@ -2,8 +2,6 @@
 
 #include "PathConfig.inl"
 
-#include "Materials/Lambertian.hpp"
-
 #include "Scene/Scene.hpp"
 #include "Scene/Camera.hpp"
 
@@ -26,16 +24,17 @@ int main()
 {
     constexpr usize IMAGE_WIDTH = 400;
     constexpr usize IMAGE_HEIGHT = 300;
-    constexpr usize SAMPLES = 64;
+    constexpr usize SAMPLES = 32;
     constexpr usize DEPTH = 8;
 
 	constexpr f32 INV_GAMMA = 1.0f / 2.2f;
 
 	std::string outputFile = (std::filesystem::path(PathConfig::OutputDir) / "image.png").string();
 
-	std::shared_ptr<Lambertian> lambertian = std::make_shared<Lambertian>(glm::vec3(0.8f, 0.2f, 0.8f));
-
 	std::unique_ptr<Scene> scene = std::make_unique<Scene>();
+
+	usize lambertian = scene->AddMaterial(Material { MaterialType::Lambertian, glm::vec3(0.8f, 0.2f, 0.8f) });
+
 	scene->Push<Sphere>(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f, lambertian);
 	scene->Push<Sphere>(glm::vec3(0.0f, -100.5f, -1.0f), 100.0f, lambertian);
 

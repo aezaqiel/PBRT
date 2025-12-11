@@ -2,8 +2,6 @@
 
 #include "Containers/Ray.hpp"
 
-class Material;
-
 struct HitRecord
 {
     glm::vec3 p;
@@ -11,7 +9,7 @@ struct HitRecord
     f32 t;
     bool frontFace;
 
-    std::shared_ptr<Material> material;
+    usize material;
 
     void SetFace(const Ray& ray, const glm::vec3& outNormal)
     {

@@ -2,13 +2,16 @@
 
 #include "Primitives/HitRecord.hpp"
 
-class Material
+enum class MaterialType : u8
 {
-public:
-    virtual ~Material() = default;
+    None,
+    Lambertian
+};
 
-    virtual bool Scatter(const Ray& ray, const HitRecord& record, glm::vec3& attenuation, Ray& scattered) const
-    {
-        return false;
-    }
+struct Material
+{
+    MaterialType type { MaterialType::None };
+    glm::vec3 albedo { 0.0f };
+
+    bool Scatter(const Ray& ray, const HitRecord& record, glm::vec3& attenuation, Ray& scattered) const;
 };

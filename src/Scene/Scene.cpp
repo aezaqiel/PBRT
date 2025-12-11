@@ -1,5 +1,14 @@
 #include "Scene.hpp"
 
+Scene::Scene()
+{
+    // Default material
+    m_Materials.push_back(Material {
+        .type = MaterialType::Lambertian,
+        .albedo = glm::vec3(1.0f, 0.0f, 1.0f)
+    });
+}
+
 bool Scene::Hit(const Ray& ray, Interval clip, HitRecord& record) const
 {
     HitRecord scratch;
