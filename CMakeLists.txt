@@ -16,6 +16,7 @@ add_subdirectory(thirdparty/glm)
 add_executable(${PROJECT_NAME}
     src/Main.cpp
     src/Types.hpp
+    src/Ray.hpp
 
     src/Platform/STBImpl.cpp
 )

@@ -1,5 +1,15 @@
 #include <stb_image_write.h>
 
+#include "Ray.hpp"
+
+glm::vec3 RayColor(const Ray& r)
+{
+	glm::vec3 unitDirection = glm::normalize(r.direction);
+	f32 a = 0.5f * (unitDirection.y + 1.0f);
+
+	return glm::mix(glm::vec3(1.0f), glm::vec3(0.5f, 0.7f, 1.0f), a);
+}
+
 int main()
 {
     constexpr usize IMAGE_WIDTH = 1280;
@@ -9,18 +19,38 @@ int main()
 
   	std::vector<u8> buffer(IMAGE_WIDTH * IMAGE_HEIGHT * 3);
 
+	f32 aspectRatio = static_cast<f32>(IMAGE_WIDTH) / static_cast<f32>(IMAGE_HEIGHT);
+
+	f32 focalLength = 1.0f;
+	f32 viewportHeight = 2.0f;
+	f32 viewportWidth = viewportHeight * (aspectRatio);
+
+	glm::vec3 cameraCenter(0.0f);
+
+	glm::vec3 viewportU = glm::vec3(viewportWidth, 0.0f, 0.0f);
+	glm::vec3 viewportV = glm::vec3(0.0f, -viewportHeight, 0.0f);
+
+	glm::vec3 pixelDeltaU = viewportU / static_cast<f32>(IMAGE_WIDTH);
+	glm::vec3 pixelDeltaV = viewportV / static_cast<f32>(IMAGE_HEIGHT);
+
+	glm::vec3 viewportUpperLeft = cameraCenter - glm::vec3(0.0f, 0.0f, focalLength) - viewportU / 2.0f - viewportV / 2.0f;
+	glm::vec3 pixel00Loc = viewportUpperLeft + 0.5f * (pixelDeltaU + pixelDeltaV);
+
   	for (usize j = 0; j < IMAGE_HEIGHT; ++j) {
 		std::clog << "\rScanlines remaining: " << (IMAGE_HEIGHT - 1) << ' ' << std::flush;
     	for (usize i = 0; i < IMAGE_WIDTH; ++i) {
-			f32 r = static_cast<f32>(i) / static_cast<f32>(IMAGE_WIDTH - 1);
-			f32 g = static_cast<f32>(j) / static_cast<f32>(IMAGE_HEIGHT - 1);
-			f32 b = 0.25f;
+			glm::vec3 pixelCenter = pixel00Loc + (static_cast<f32>(i) * pixelDeltaU) + (static_cast<f32>(j) * pixelDeltaV);
+			glm::vec3 rayDirection = pixelCenter - cameraCenter;
+
+			Ray r(cameraCenter, rayDirection);
+
+			glm::vec3 color = RayColor(r);
 
 			usize index = (i + j * IMAGE_WIDTH) * 3;
 
-			buffer[index + 0] = static_cast<u8>(r * 255.0f);
-			buffer[index + 1] = static_cast<u8>(g * 255.0f);
-			buffer[index + 2] = static_cast<u8>(b * 255.0f);
+			buffer[index + 0] = static_cast<u8>(color.r * 255.0f);
+			buffer[index + 1] = static_cast<u8>(color.g * 255.0f);
+			buffer[index + 2] = static_cast<u8>(color.b * 255.0f);
     	}
   	}
 	std::clog << "\rDone                                                   " << std::endl;
