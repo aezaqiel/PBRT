@@ -18,6 +18,12 @@ add_executable(${PROJECT_NAME}
     src/Types.hpp
     src/Ray.hpp
 
+    src/Geometry/Hittable.hpp
+    src/Geometry/HittableList.hpp
+    src/Geometry/HittableList.cpp
+    src/Geometry/Sphere.hpp
+    src/Geometry/Sphere.cpp
+
     src/Platform/STBImpl.cpp
 )
 
@@ -35,6 +41,7 @@ PRIVATE
 target_compile_definitions(${PROJECT_NAME}
 PRIVATE
     NOMINMAX
+    GLM_ENABLE_EXPERIMENTAL
 )
 
 target_precompile_headers(${PROJECT_NAME}

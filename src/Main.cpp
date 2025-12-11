@@ -2,9 +2,18 @@
 
 #include "Ray.hpp"
 
-glm::vec3 RayColor(const Ray& r)
+#include "Geometry/Hittable.hpp"
+#include "Geometry/HittableList.hpp"
+#include "Geometry/Sphere.hpp"
+
+glm::vec3 RayColor(const Ray& ray, const Hittable& scene)
 {
-	glm::vec3 unitDirection = glm::normalize(r.direction);
+	HitRecord record;
+	if (scene.Hit(ray, 0.0001f, std::numeric_limits<f32>::infinity(), record)) {
+		return 0.5f * (record.normal + 1.0f);
+	}
+
+	glm::vec3 unitDirection = glm::normalize(ray.direction);
 	f32 a = 0.5f * (unitDirection.y + 1.0f);
 
 	return glm::mix(glm::vec3(1.0f), glm::vec3(0.5f, 0.7f, 1.0f), a);
@@ -18,6 +27,10 @@ int main()
     constexpr usize DEPTH = 8;
 
   	std::vector<u8> buffer(IMAGE_WIDTH * IMAGE_HEIGHT * 3);
+
+	HittableList scene;
+	scene.Push(std::make_shared<Sphere>(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f));
+	scene.Push(std::make_shared<Sphere>(glm::vec3(0.0f, -100.5f, -1.0f), 100.0f));
 
 	f32 aspectRatio = static_cast<f32>(IMAGE_WIDTH) / static_cast<f32>(IMAGE_HEIGHT);
 
@@ -42,9 +55,7 @@ int main()
 			glm::vec3 pixelCenter = pixel00Loc + (static_cast<f32>(i) * pixelDeltaU) + (static_cast<f32>(j) * pixelDeltaV);
 			glm::vec3 rayDirection = pixelCenter - cameraCenter;
 
-			Ray r(cameraCenter, rayDirection);
-
-			glm::vec3 color = RayColor(r);
+			glm::vec3 color = RayColor(Ray(cameraCenter, rayDirection), scene);
 
 			usize index = (i + j * IMAGE_WIDTH) * 3;
 
