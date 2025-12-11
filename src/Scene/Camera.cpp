@@ -3,24 +3,31 @@
 #include "Core/Rng.hpp"
 #include "Materials/Material.hpp"
 
-Camera::Camera(usize width, usize height, f32 near, f32 far)
-    : m_Width(width), m_Height(height), m_Clip(near, far)
+Camera::Camera(usize width, usize height, f32 vFov, const glm::vec3& lookfrom, const glm::vec3& lookat, const Interval& clip)
+    : m_Width(width), m_Height(height), m_Clip(clip), m_Center(lookfrom)
 {
 	f32 aspectRatio = static_cast<f32>(m_Width) / static_cast<f32>(m_Height);
 
-	f32 focalLength = 1.0f;
-	f32 viewportHeight = 2.0f;
+    glm::vec3 direction = lookfrom - lookat;
+
+	f32 focalLength = glm::length(direction);
+    f32 theta = glm::radians(vFov);
+    f32 h = std::tan(theta / 2.0f);
+
+	f32 viewportHeight = 2.0f * h * focalLength;
 	f32 viewportWidth = viewportHeight * (aspectRatio);
 
-    m_Center = glm::vec3(0.0f);
+    glm::vec3 w = glm::normalize(direction);
+    glm::vec3 u = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), w));
+    glm::vec3 v = glm::cross(w, u);
 
-	glm::vec3 viewportU = glm::vec3(viewportWidth, 0.0f, 0.0f);
-	glm::vec3 viewportV = glm::vec3(0.0f, -viewportHeight, 0.0f);
+	glm::vec3 viewportU = viewportWidth * u;
+	glm::vec3 viewportV = viewportHeight * -v;
 
 	m_PixelDeltaU = viewportU / static_cast<f32>(m_Width);
 	m_PixelDeltaV = viewportV / static_cast<f32>(m_Height);
 
-	glm::vec3 viewportUpperLeft = m_Center - glm::vec3(0.0f, 0.0f, focalLength) - viewportU / 2.0f - viewportV / 2.0f;
+	glm::vec3 viewportUpperLeft = m_Center - w * focalLength - viewportU / 2.0f - viewportV / 2.0f;
 	m_Pixel00Loc = viewportUpperLeft + 0.5f * (m_PixelDeltaU + m_PixelDeltaV);
 }
 

@@ -5,7 +5,7 @@
 class Camera
 {
 public:
-    Camera(usize width, usize height, f32 near, f32 far);
+    Camera(usize width, usize height, f32 vFov, const glm::vec3& lookfrom, const glm::vec3& lookat, const Interval& clip);
     ~Camera() = default;
 
     inline void SetScene(Scene* scene)

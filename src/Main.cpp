@@ -45,7 +45,10 @@ int main()
 
 	std::unique_ptr<Camera> camera = std::make_unique<Camera>(
 		IMAGE_WIDTH, IMAGE_HEIGHT,
-		0.001f, std::numeric_limits<f32>::infinity()
+		90.0f,
+		glm::vec3(-2.0f, 2.0f, 1.0f),
+		glm::vec3(0.0f, 0.0f, -1.0f),
+		Interval(0.001f, std::numeric_limits<f32>::infinity())
 	);
 
 	camera->SetScene(scene.get());
