@@ -13,6 +13,14 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_subdirectory(thirdparty/glm)
 
+file(TO_CMAKE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/render OUTPUT_FOLDER)
+
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/PathConfig.inl
+    ${CMAKE_CURRENT_BINARY_DIR}/generated/PathConfig.inl
+    @ONLY
+)
+
 add_executable(${PROJECT_NAME}
     src/Main.cpp
     src/Types.hpp
@@ -38,6 +46,7 @@ target_include_directories(${PROJECT_NAME}
 PRIVATE
     src
     thirdparty/stb
+    ${CMAKE_CURRENT_BINARY_DIR}/generated
 )
 
 target_link_libraries(${PROJECT_NAME}

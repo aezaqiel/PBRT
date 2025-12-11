@@ -1,5 +1,7 @@
 #include <stb_image_write.h>
 
+#include "PathConfig.inl"
+
 #include "Scene/Scene.hpp"
 #include "Scene/Camera.hpp"
 
@@ -27,6 +29,8 @@ int main()
 
 	constexpr f32 INV_GAMMA = 1.0f / 2.2f;
 
+	std::string outputFile = (std::filesystem::path(PathConfig::OutputDir) / "image.png").string();
+
 	Scene scene;
 	scene.Push<Sphere>(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f);
 	scene.Push<Sphere>(glm::vec3(0.0f, -100.5f, -1.0f), 100.0f);
@@ -51,8 +55,8 @@ int main()
 		image[index + 2] = static_cast<u8>(std::clamp(color.b * 255.0f, 0.0f, 255.0f));
 	}
 
-  	if (stbi_write_png("image.png", IMAGE_WIDTH, IMAGE_HEIGHT, 3, image.data(), IMAGE_WIDTH * 3)) {
-		std::println("Image saved to image.png");
+  	if (stbi_write_png(outputFile.c_str(), IMAGE_WIDTH, IMAGE_HEIGHT, 3, image.data(), IMAGE_WIDTH * 3)) {
+		std::println("Image saved to {}", outputFile);
 	} else {
 		std::println("Failed to save image");
 	}
