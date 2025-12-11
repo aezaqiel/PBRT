@@ -4,6 +4,7 @@
 
 #include "Lambertian.hpp"
 #include "Metal.hpp"
+#include "Dielectric.hpp"
 
 template <typename T>
 concept Scatterable = requires(const T& t, const Ray& r, const HitRecord& rec, glm::vec3& att, Ray& scat)
@@ -13,7 +14,8 @@ concept Scatterable = requires(const T& t, const Ray& r, const HitRecord& rec, g
 
 using MaterialVariant = std::variant<
     Lambertian,
-    Metal
+    Metal,
+    Dielectric
 >;
 
 template <typename T>

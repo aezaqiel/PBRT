@@ -1,0 +1,43 @@
+#include "Dielectric.hpp"
+
+#include "Core/Rng.hpp"
+
+namespace {
+
+    f32 Reflectance(f32 cosine, f32 ri)
+    {
+        f32 r0 = (1.0f - ri) / (1.0f + ri);
+        r0 = r0 * r0;
+        return r0 + (1.0f - r0) * std::pow(1.0f - cosine, 5.0f);
+    }
+
+}
+
+Dielectric::Dielectric(f32 ri)
+    : m_RefractionIndex(ri)
+{
+}
+
+bool Dielectric::Scatter(const Ray& ray, const HitRecord& record, glm::vec3& attenuation, Ray& scattered) const
+{
+    attenuation = glm::vec3(1.0f);
+
+    f32 ri = record.frontFace ? (1.0f / m_RefractionIndex) : m_RefractionIndex;
+
+    glm::vec3 unitDir = glm::normalize(ray.direction);
+    f32 cosTheta = std::fmin(glm::dot(-unitDir, record.normal), 1.0f);
+    f32 sinTheta = std::sqrtf(1.0f - cosTheta * cosTheta);
+
+    bool cannotRefract = ri * sinTheta > 1.0f;
+    glm::vec3 direction;
+
+    if (cannotRefract || Reflectance(cosTheta, ri) > Random::Float32()) {
+        direction = glm::reflect(unitDir, record.normal);
+    } else {
+        direction = glm::refract(unitDir, record.normal, ri);
+    }
+
+    scattered = Ray(record.p, direction);
+
+    return true;
+}

@@ -41,6 +41,8 @@ add_executable(${PROJECT_NAME}
     src/Materials/Lambertian.cpp
     src/Materials/Metal.hpp
     src/Materials/Metal.cpp
+    src/Materials/Dielectric.hpp
+    src/Materials/Dielectric.cpp
 
     src/Scene/Camera.hpp
     src/Scene/Camera.cpp

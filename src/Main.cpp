@@ -35,7 +35,7 @@ int main()
 
 	auto ground = scene->CreateMaterial<Lambertian>(glm::vec3(0.8f, 0.8f, 0.0f));
 	auto center = scene->CreateMaterial<Lambertian>(glm::vec3(0.1f, 0.2f, 0.5f));
-	auto left = scene->CreateMaterial<Metal>(glm::vec3(0.8f, 0.8f, 0.8f), 0.3f);
+	auto left = scene->CreateMaterial<Dielectric>(1.0f / 1.33f);
 	auto right = scene->CreateMaterial<Metal>(glm::vec3(0.8f, 0.6f, 0.2f), 1.0f);
 
 	scene->Push<Sphere>(glm::vec3( 0.0f, -100.5f, -1.0f), 100.0f, ground);
