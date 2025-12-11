@@ -32,6 +32,8 @@ public:
 
     bool Hit(const Ray& ray, Interval clip, HitRecord& record) const;
 
+    static std::unique_ptr<Scene> RandomSpheres();
+
 private:
     std::vector<MaterialVariant> m_Materials;
     std::vector<Sphere> m_Spheres;

@@ -36,11 +36,6 @@ Camera::Camera(usize width, usize height, f32 vFov, const glm::vec3& lookfrom, c
 
 std::vector<glm::vec3> Camera::Render(usize samples, usize depth) const
 {
-    std::println("Rendering:");
-    std::println(" - Resolution: {}, {}", m_Width, m_Height);
-    std::println(" - Samples: {}", samples);
-    std::println(" - Depth: {}", depth);
-
     std::vector<glm::vec3> buffer(m_Width * m_Height, glm::vec3(0.0f));
 
     if (!m_Scene) {
@@ -48,34 +43,59 @@ std::vector<glm::vec3> Camera::Render(usize samples, usize depth) const
         return buffer;
     }
 
-    for (usize j = 0; j < m_Height; ++j) {
+    std::println("Rendering:");
+    std::println(" - Resolution: {}, {}", m_Width, m_Height);
+    std::println(" - Samples: {}", samples);
+    std::println(" - Depth: {}", depth);
 
-        constexpr int barWidth = 50;
-        f32 progress = static_cast<f32>(j) / static_cast<f32>(m_Height);
-        int pos = static_cast<int>(barWidth * progress);
+    std::vector<usize> vertical(m_Height);
+    std::iota(vertical.begin(), vertical.end(), 0);
 
-        std::print(std::clog, "\r[");
-        for (int b = 0; b < barWidth; ++b) {
-            if (b < pos) std::print(std::clog, "=");
-            else if (b == pos) std::print(std::clog, ">");
-            else std::print(std::clog, " ");
-        }
-        std::print(std::clog, "] {} %", static_cast<int>(progress * 100.0f));
-        std::clog << std::flush;
+    std::mutex progressMutex;
+    std::atomic<usize> completedLines = 0;
 
-        for (usize i = 0; i < m_Width; ++i) {
-            glm::vec3 color(0.0f);
+    auto start = std::chrono::steady_clock::now();
 
-            for (usize s = 0; s < samples; ++s) {
-                Ray ray = GetRay(i, j);
-                color += RayColor(ray, depth);
+    std::for_each(std::execution::par, vertical.begin(), vertical.end(),
+        [this, samples, depth, &buffer, &progressMutex, &completedLines](usize j) {
+            for (usize i = 0; i < m_Width; ++i) {
+                glm::vec3 color(0.0f);
+
+                for (usize s = 0; s < samples; ++s) {
+                    Ray ray = GetRay(i, j);
+                    color += RayColor(ray, depth);
+                }
+
+                color /= static_cast<f32>(samples);
+                buffer[i + j * m_Width] = color;
             }
 
-            color /= static_cast<f32>(samples);
-            buffer[i + j * m_Width] = color;
+            std::scoped_lock<std::mutex> lock(progressMutex);
+            usize finished = ++completedLines;
+
+            constexpr i32 barWidth = 50;
+            f32 progress = static_cast<f32>(finished) / static_cast<f32>(m_Height);
+            i32 pos = static_cast<i32>(barWidth * progress);
+
+            std::print(std::clog, "\r[");
+            for (int b = 0; b < barWidth; ++b) {
+                if (b < pos) std::print(std::clog, "=");
+                else if (b == pos) std::print(std::clog, ">");
+                else std::print(std::clog, " ");
+            }
+            std::print(std::clog, "] {} %", static_cast<int>(progress * 100.0f));
+            std::clog << std::flush;
         }
-    }
+    );
+
     std::println(std::clog, "\r[==================================================] 100 %\nDone.");
+
+    auto end = std::chrono::steady_clock::now();
+
+    std::chrono::duration<f32> duration = end - start;
+    f32 seconds = duration.count();
+
+    std::println("Render time: {:.2f} s", seconds);
 
     return buffer;
 }

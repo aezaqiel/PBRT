@@ -33,7 +33,7 @@ public:
         return glm::vec3(Float32(), Float32(), Float32());
     }
 
-    inline static glm::vec3 Vecf(f32 min, f32 max)
+    inline static glm::vec3 Vec3f(f32 min, f32 max)
     {
         return glm::vec3(Float32(min, max), Float32(min, max), Float32(min, max));
     }
