@@ -1,6 +1,7 @@
 #include "Camera.hpp"
 
 #include "Core/Rng.hpp"
+#include "Materials/Material.hpp"
 
 Camera::Camera(usize width, usize height, f32 near, f32 far)
     : m_Width(width), m_Height(height), m_Clip(near, far)
@@ -79,9 +80,20 @@ Ray Camera::GetRay(usize i, usize j)
 
 glm::vec3 Camera::RayColor(const Ray& ray, usize depth)
 {
+    if (depth <= 0) {
+        return glm::vec3(0.0f);
+    }
+
     HitRecord record;
     if (m_Scene->Hit(ray, m_Clip, record)) {
-        return 0.5f * RayColor(Ray(record.p, record.normal), depth - 1);
+        glm::vec3 attenuation;
+        Ray scattered;
+
+        if (record.material->Scatter(ray, record, attenuation, scattered)) {
+            return attenuation * RayColor(scattered, depth - 1);
+        }
+
+        return glm::vec3(0.0f);
     }
 
     // Skybox

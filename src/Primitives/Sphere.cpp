@@ -1,7 +1,7 @@
 #include "Sphere.hpp"
 
-Sphere::Sphere(const glm::vec3& center, f32 radius)
-    : m_Center(center), m_Radius(radius)
+Sphere::Sphere(const glm::vec3& center, f32 radius, const std::shared_ptr<Material>& material)
+    : m_Center(center), m_Radius(std::fmax(0.0f, radius)), m_Material(material)
 {
 }
 
@@ -33,6 +33,7 @@ bool Sphere::Hit(const Ray& ray, Interval t, HitRecord& record) const
     record.t = root;
     record.p = ray.At(root);
     record.SetFace(ray, (record.p - m_Center) / m_Radius);
+    record.material = m_Material;
 
     return true;
 }
