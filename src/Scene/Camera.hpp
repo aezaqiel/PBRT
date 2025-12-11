@@ -17,7 +17,7 @@ public:
 
 private:
     Ray GetRay(usize i, usize j);
-    glm::vec3 RayColor(const Ray& ray, usize depth);
+    glm::vec3 RayColor(Ray ray, usize depth);
 
 private:
     usize m_Width;

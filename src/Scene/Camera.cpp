@@ -78,29 +78,35 @@ Ray Camera::GetRay(usize i, usize j)
     return Ray(m_Center, pixelSample - m_Center);
 }
 
-glm::vec3 Camera::RayColor(const Ray& ray, usize depth)
+glm::vec3 Camera::RayColor(Ray ray, usize depth)
 {
-    if (depth <= 0) {
-        return glm::vec3(0.0f);
-    }
+    glm::vec3 accumulated(1.0f);
+    glm::vec3 color(0.0f);
 
-    HitRecord record;
-    if (m_Scene->Hit(ray, m_Clip, record)) {
-        glm::vec3 attenuation;
-        Ray scattered;
+    for (usize i = 0; i < depth; ++i) {
+        HitRecord record;
 
-        bool scatter = std::visit([&](const auto& mat) -> bool {
-            return mat.Scatter(ray, record, attenuation, scattered);
-        }, m_Scene->GetMaterial(record.material));
+        if (m_Scene->Hit(ray, m_Clip, record)) {
+            glm::vec3 attenuation;
+            Ray scattered;
 
-        if (scatter) {
-            return attenuation * RayColor(scattered, depth - 1);
+            bool scatter = std::visit([&](const auto& mat) -> bool {
+                return mat.Scatter(ray, record, attenuation, scattered);
+            }, m_Scene->GetMaterial(record.material));
+
+            if (scatter) {
+                accumulated *= attenuation;
+                ray = scattered;
+            } else {
+                return glm::vec3(0.0f);
+            }
+        } else {
+            f32 a = 0.5f * (glm::normalize(ray.direction).y + 1.0f);
+            glm::vec3 sky = glm::mix(glm::vec3(1.0f), glm::vec3(0.5f, 0.7f, 1.0f), a);
+
+            return accumulated * sky;
         }
-
-        return glm::vec3(0.0f);
     }
 
-    // Skybox
-	f32 a = 0.5f * (glm::normalize(ray.direction).y + 1.0f);
-	return glm::mix(glm::vec3(1.0f), glm::vec3(0.5f, 0.7f, 1.0f), a);
+    return glm::vec3(0.0f);
 }
