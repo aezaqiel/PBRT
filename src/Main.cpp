@@ -1,7 +1,5 @@
 #include <stb_image_write.h>
 
-#include "Ray.hpp"
-
 #include "Geometry/Hittable.hpp"
 #include "Geometry/HittableList.hpp"
 #include "Geometry/Sphere.hpp"
@@ -9,7 +7,9 @@
 glm::vec3 RayColor(const Ray& ray, const Hittable& scene)
 {
 	HitRecord record;
-	if (scene.Hit(ray, 0.0001f, std::numeric_limits<f32>::infinity(), record)) {
+	Interval clip(0.0001f, std::numeric_limits<f32>::infinity());
+
+	if (scene.Hit(ray, clip, record)) {
 		return 0.5f * (record.normal + 1.0f);
 	}
 

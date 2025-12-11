@@ -8,7 +8,7 @@ public:
     Sphere(const glm::vec3& center, f32 radius);
     virtual ~Sphere() = default;
 
-    virtual bool Hit(const Ray& ray, f32 tmin, f32 tmax, HitRecord& record) const override;
+    virtual bool Hit(const Ray& ray, Interval t, HitRecord& record) const override;
 
 private:
     glm::vec3 m_Center;

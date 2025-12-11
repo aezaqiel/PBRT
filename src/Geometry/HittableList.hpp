@@ -18,7 +18,7 @@ public:
         m_Hittables.clear();
     }
 
-    virtual bool Hit(const Ray& ray, f32 tmin, f32 tmax, HitRecord& record) const override;
+    virtual bool Hit(const Ray& ray, Interval t, HitRecord& record) const override;
 
 private:
     std::vector<std::shared_ptr<Hittable>> m_Hittables;

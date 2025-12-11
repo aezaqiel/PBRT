@@ -7,7 +7,7 @@ Sphere::Sphere(const glm::vec3& center, f32 radius)
 {
 }
 
-bool Sphere::Hit(const Ray& ray, f32 tmin, f32 tmax, HitRecord& record) const
+bool Sphere::Hit(const Ray& ray, Interval t, HitRecord& record) const
 {
     glm::vec3 intersection;
     glm::vec3 normal;
@@ -17,7 +17,7 @@ bool Sphere::Hit(const Ray& ray, f32 tmin, f32 tmax, HitRecord& record) const
     }
 
     f32 distance = glm::distance(ray.origin, intersection);
-    if (distance < tmin || distance > tmax) {
+    if (!t.surrounds(distance)) {
         return false;
     }
 

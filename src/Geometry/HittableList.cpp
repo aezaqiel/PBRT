@@ -1,15 +1,14 @@
 #include "HittableList.hpp"
 
-bool HittableList::Hit(const Ray& ray, f32 tmin, f32 tmax, HitRecord& record) const
+bool HittableList::Hit(const Ray& ray, Interval t, HitRecord& record) const
 {
     HitRecord scratchRecord;
     bool hit = false;
-    f32 closest = tmax;
 
     for (const auto& object : m_Hittables) {
-        if (object->Hit(ray, tmin, closest, scratchRecord)) {
+        if (object->Hit(ray, t, scratchRecord)) {
             hit = true;
-            closest = scratchRecord.t;
+            t.max = scratchRecord.t;
             record = scratchRecord;
         }
     }

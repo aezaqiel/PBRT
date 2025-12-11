@@ -16,7 +16,10 @@ add_subdirectory(thirdparty/glm)
 add_executable(${PROJECT_NAME}
     src/Main.cpp
     src/Types.hpp
-    src/Ray.hpp
+
+    src/Containers/Ray.hpp
+    src/Containers/Interval.hpp
+    src/Containers/Interval.cpp
 
     src/Geometry/Hittable.hpp
     src/Geometry/HittableList.hpp
