@@ -23,7 +23,9 @@ configure_file(
 
 add_executable(${PROJECT_NAME}
     src/Main.cpp
-    src/Types.hpp
+
+    src/Core/Types.hpp
+    src/Core/Rng.hpp
 
     src/Containers/Ray.hpp
     src/Containers/Interval.hpp
