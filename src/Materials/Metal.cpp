@@ -10,7 +10,7 @@ Metal::Metal(const glm::vec3& albedo, f32 fuzz)
 bool Metal::Scatter(const Ray& ray, const HitRecord& record, glm::vec3& attenuation, Ray& scattered) const
 {
     glm::vec3 reflected = glm::reflect(ray.direction, record.normal);
-    reflected = glm::normalize(reflected) + (m_Fuzz * Random::UnitVector());
+    reflected = glm::normalize(reflected) + (m_Fuzz * Random::UnitVec3f());
 
     scattered = Ray(record.p, reflected);
     attenuation = m_Albedo;

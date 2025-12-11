@@ -38,7 +38,7 @@ public:
         return glm::vec3(Float32(min, max), Float32(min, max), Float32(min, max));
     }
 
-    inline static glm::vec3 UnitVector()
+    inline static glm::vec3 UnitVec3f()
     {
         f32 z = Float32() * 2.0f - 1.0f;
         f32 a = Float32() * 2.0f * glm::pi<f32>();
@@ -48,6 +48,22 @@ public:
         f32 y = r * std::sin(a);
         
         return glm::vec3(x, y, z);
+    }
+
+    inline static glm::vec2 InUnitDisk()
+    {
+        f32 a = Float32() * 2.0f * glm::pi<f32>();
+        f32 r = std::sqrtf(Float32());
+        f32 x = r * std::cos(a);
+        f32 y = r * std::sin(a);
+
+        return glm::vec2(x, y);
+    }
+
+    inline static glm::vec3 InUnitDisk3D()
+    {
+        glm::vec2 p = InUnitDisk();
+        return glm::vec3(p.x, p.y, 0.0f);
     }
 
 private:

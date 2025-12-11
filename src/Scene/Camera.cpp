@@ -3,18 +3,17 @@
 #include "Core/Rng.hpp"
 #include "Materials/Material.hpp"
 
-Camera::Camera(usize width, usize height, f32 vFov, const glm::vec3& lookfrom, const glm::vec3& lookat, const Interval& clip)
-    : m_Width(width), m_Height(height), m_Clip(clip), m_Center(lookfrom)
+Camera::Camera(usize width, usize height, f32 vFov, const glm::vec3& lookfrom, const glm::vec3& lookat, f32 defocusAngle, f32 focusDistance, const Interval& clip)
+    : m_Width(width), m_Height(height), m_Clip(clip), m_Center(lookfrom), m_DefocusAngle(defocusAngle)
 {
 	f32 aspectRatio = static_cast<f32>(m_Width) / static_cast<f32>(m_Height);
 
     glm::vec3 direction = lookfrom - lookat;
 
-	f32 focalLength = glm::length(direction);
     f32 theta = glm::radians(vFov);
     f32 h = std::tan(theta / 2.0f);
 
-	f32 viewportHeight = 2.0f * h * focalLength;
+	f32 viewportHeight = 2.0f * h * focusDistance;
 	f32 viewportWidth = viewportHeight * (aspectRatio);
 
     glm::vec3 w = glm::normalize(direction);
@@ -27,11 +26,15 @@ Camera::Camera(usize width, usize height, f32 vFov, const glm::vec3& lookfrom, c
 	m_PixelDeltaU = viewportU / static_cast<f32>(m_Width);
 	m_PixelDeltaV = viewportV / static_cast<f32>(m_Height);
 
-	glm::vec3 viewportUpperLeft = m_Center - w * focalLength - viewportU / 2.0f - viewportV / 2.0f;
+	glm::vec3 viewportUpperLeft = m_Center - w * focusDistance - viewportU / 2.0f - viewportV / 2.0f;
 	m_Pixel00Loc = viewportUpperLeft + 0.5f * (m_PixelDeltaU + m_PixelDeltaV);
+
+    f32 defocusRadius = focusDistance * std::tan(glm::radians(defocusAngle / 2.0f));
+    m_DefocusU = u * defocusRadius;
+    m_DefocusV = v * defocusRadius;
 }
 
-std::vector<glm::vec3> Camera::Render(usize samples, usize depth)
+std::vector<glm::vec3> Camera::Render(usize samples, usize depth) const
 {
     std::println("Rendering:");
     std::println(" - Resolution: {}, {}", m_Width, m_Height);
@@ -77,15 +80,24 @@ std::vector<glm::vec3> Camera::Render(usize samples, usize depth)
     return buffer;
 }
 
-Ray Camera::GetRay(usize i, usize j)
+glm::vec3 Camera::DefocusDiskSample() const
+{
+    glm::vec2 p = Random::InUnitDisk();
+    return m_Center + p[0] * m_DefocusU + p[1] * m_DefocusV;
+}
+
+Ray Camera::GetRay(usize i, usize j) const
 {
     glm::vec3 offset(Random::Float32() - 0.5f, Random::Float32() - 0.5f, 0.0f);
     glm::vec3 pixelSample = m_Pixel00Loc + ((static_cast<f32>(i) + offset.x) * m_PixelDeltaU) + ((static_cast<f32>(j) + offset.y) * m_PixelDeltaV);
 
-    return Ray(m_Center, pixelSample - m_Center);
+    glm::vec3 origin = (m_DefocusAngle <= 0.0f) ? m_Center : DefocusDiskSample();
+    glm::vec3 direction = pixelSample - origin;
+
+    return Ray(origin, direction);
 }
 
-glm::vec3 Camera::RayColor(Ray ray, usize depth)
+glm::vec3 Camera::RayColor(Ray ray, usize depth) const
 {
     glm::vec3 accumulated(1.0f);
     glm::vec3 color(0.0f);

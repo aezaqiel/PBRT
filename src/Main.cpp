@@ -24,7 +24,7 @@ int main()
 {
     constexpr usize IMAGE_WIDTH = 400;
     constexpr usize IMAGE_HEIGHT = 300;
-    constexpr usize SAMPLES = 32;
+    constexpr usize SAMPLES = 64;
     constexpr usize DEPTH = 8;
 
 	constexpr f32 INV_GAMMA = 1.0f / 2.2f;
@@ -45,9 +45,11 @@ int main()
 
 	std::unique_ptr<Camera> camera = std::make_unique<Camera>(
 		IMAGE_WIDTH, IMAGE_HEIGHT,
-		90.0f,
+		20.0f,
 		glm::vec3(-2.0f, 2.0f, 1.0f),
 		glm::vec3(0.0f, 0.0f, -1.0f),
+		10.0f,
+		3.4f,
 		Interval(0.001f, std::numeric_limits<f32>::infinity())
 	);
 
