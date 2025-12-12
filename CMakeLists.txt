@@ -48,6 +48,7 @@ add_executable(${PROJECT_NAME}
 
     src/Scene/Camera.hpp
     src/Scene/Camera.cpp
+    src/Scene/BVHNode.hpp
     src/Scene/Scene.hpp
     src/Scene/Scene.cpp
 

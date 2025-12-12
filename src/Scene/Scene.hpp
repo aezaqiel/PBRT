@@ -1,7 +1,10 @@
 #pragma once
 
+#include "BVHNode.hpp"
+
 #include "Materials/Material.hpp"
 #include "Primitives/Primitive.hpp"
+
 #include "Containers/AABB.hpp"
 
 class Scene
@@ -33,14 +36,21 @@ public:
 
     inline AABB BBox() const { return m_BBox; }
 
+    void Build();
+
     bool Hit(const Ray& ray, Interval clip, HitRecord& record) const;
 
     static std::unique_ptr<Scene> TestScene();
     static std::unique_ptr<Scene> RandomSpheres();
 
 private:
+    void BuildRecursive(u32 nodeIdx, u32 start, u32 end);
+
+private:
     std::vector<MaterialVariant> m_Materials;
     std::vector<PrimitiveVariant> m_Primitives;
+
+    std::vector<BVHNode> m_Nodes;
 
     AABB m_BBox;
 };
