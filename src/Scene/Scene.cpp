@@ -79,17 +79,18 @@ std::unique_ptr<Scene> Scene::RandomSpheres()
         scene->CreateMaterial<Metal>(glm::vec3(0.7f, 0.6f, 0.5f), 0.0)
     );
 
-    for (i32 a = -11; a < 11; ++a) {
-        for (i32 b = -11; b < 11; ++b) {
+    for (i32 a = -10; a < 10; ++a) {
+        for (i32 b = -10; b < 10; ++b) {
             f32 choose = Random::Float32();
             glm::vec3 center(a + 0.9f * Random::Float32(), 0.2f, b + 0.9f * Random::Float32());
 
             if (glm::length(center - glm::vec3(4.0f, 0.2f, 0.0f)) > 0.9f) {
                 if (choose < 0.8f) {
                     glm::vec3 albedo = Random::Vec3f() * Random::Vec3f();
+                    glm::vec3 center2 = center + glm::vec3(0, Random::Float32(0.0f, 0.5f), 0.0f);
 
                     scene->Push<Sphere>(
-                        center, 0.2f,
+                        center, center2, 0.2f,
                         scene->CreateMaterial<Lambertian>(albedo)
                     );
                 } else if (choose < 0.95f) {

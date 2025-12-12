@@ -149,8 +149,9 @@ Ray Camera::GetRay(usize i, usize j) const
 
     glm::vec3 origin = (m_DefocusAngle <= 0.0f) ? m_Center : DefocusDiskSample();
     glm::vec3 direction = pixelSample - origin;
+    f32 time = Random::Float32();
 
-    return Ray(origin, direction);
+    return Ray(origin, direction, time);
 }
 
 glm::vec3 Camera::RayColor(Ray ray, usize depth) const

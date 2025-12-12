@@ -37,7 +37,7 @@ bool Dielectric::Scatter(const Ray& ray, const HitRecord& record, glm::vec3& att
         direction = glm::refract(unitDir, record.normal, ri);
     }
 
-    scattered = Ray(record.p, direction);
+    scattered = Ray(record.p, direction, ray.time);
 
     return true;
 }

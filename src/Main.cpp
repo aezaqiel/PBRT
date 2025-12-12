@@ -31,8 +31,8 @@ int main()
 
 	std::string outputFile = (std::filesystem::path(PathConfig::OutputDir) / "image.png").string();
 
-	// auto scene = Scene::RandomSpheres();
-	auto scene = Scene::TestScene();
+	auto scene = Scene::RandomSpheres();
+	// auto scene = Scene::TestScene();
 
 	std::unique_ptr<Camera> camera = std::make_unique<Camera>(
 		IMAGE_WIDTH, IMAGE_HEIGHT,
