@@ -11,17 +11,21 @@ Scene::Scene()
 bool Scene::Hit(const Ray& ray, Interval clip, HitRecord& record) const
 {
     HitRecord scratch;
-    bool hit = false;
+    bool hitAnything = false;
 
-    for (const auto& sphere : m_Spheres) {
-        if (sphere.Hit(ray, clip, scratch)) {
-            hit = true;
+    for (const auto& primitive : m_Primitives) {
+        bool hit = std::visit([&](const auto& prim) -> bool {
+            return prim.Hit(ray, clip, scratch);
+        }, primitive);
+
+        if (hit) {
+            hitAnything = true;
             clip.max = scratch.t;
             record = scratch;
         }
     }
 
-    return hit;
+    return hitAnything;
 }
 
 std::unique_ptr<Scene> Scene::TestScene()

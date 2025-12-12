@@ -7,4 +7,10 @@ using PrimitiveVariant = std::variant<
 >;
 
 template <typename T>
-concept Primitive = IsVariantMember<T, PrimitiveVariant>::value;
+concept Hittable = requires(const T& t, const Ray& r, Interval clip, HitRecord& rec)
+{
+    { t.Hit(r, clip, rec) } -> std::convertible_to<bool>;
+};
+
+template <typename T>
+concept Primitive = IsVariantMember<T, PrimitiveVariant>::value && Hittable<T>;
