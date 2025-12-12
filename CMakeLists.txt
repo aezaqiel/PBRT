@@ -30,6 +30,8 @@ add_executable(${PROJECT_NAME}
     src/Containers/Ray.hpp
     src/Containers/Interval.hpp
     src/Containers/Interval.cpp
+    src/Containers/AABB.hpp
+    src/Containers/AABB.cpp
 
     src/Primitives/Primitive.hpp
     src/Primitives/HitRecord.hpp

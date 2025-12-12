@@ -15,6 +15,12 @@ struct Interval
     {
     }
 
+    Interval(const Interval& a, const Interval& b)
+    {
+        min = a.min <= b.min ? a.min : b.min;
+        max = a.max >= b.max ? a.max : b.max;
+    }
+
     inline f32 Size() const
     {
         return max - min;
@@ -33,6 +39,12 @@ struct Interval
     inline f32 Clamp(f32 x) const
     {
         return std::clamp(x, min, max);
+    }
+
+    Interval Expand(f32 delta) const
+    {
+        f32 pad = delta / 2.0f;
+        return Interval(min - pad, max + pad);
     }
 
     static const Interval empty;

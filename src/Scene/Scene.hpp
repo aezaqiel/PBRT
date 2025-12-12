@@ -2,6 +2,7 @@
 
 #include "Materials/Material.hpp"
 #include "Primitives/Primitive.hpp"
+#include "Containers/AABB.hpp"
 
 class Scene
 {
@@ -25,8 +26,12 @@ public:
         requires std::constructible_from<T, Args...>
     inline void Push(Args&&... args)
     {
-        m_Primitives.emplace_back(T(std::forward<Args>(args)...));
+        T prim(std::forward<Args>(args)...);
+        m_Primitives.emplace_back(prim);
+        m_BBox = AABB(m_BBox, prim.BBox());
     }
+
+    inline AABB BBox() const { return m_BBox; }
 
     bool Hit(const Ray& ray, Interval clip, HitRecord& record) const;
 
@@ -36,4 +41,6 @@ public:
 private:
     std::vector<MaterialVariant> m_Materials;
     std::vector<PrimitiveVariant> m_Primitives;
+
+    AABB m_BBox;
 };

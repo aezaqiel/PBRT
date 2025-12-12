@@ -1,6 +1,8 @@
 #pragma once
 
 #include "HitRecord.hpp"
+
+#include "Containers/AABB.hpp"
 #include "Containers/Interval.hpp"
 
 class Sphere
@@ -11,6 +13,8 @@ public:
 
     ~Sphere() = default;
 
+    inline AABB BBox() const { return m_BBox; }
+
     bool Hit(const Ray& ray, Interval t, HitRecord& record) const;
 
 private:
@@ -18,4 +22,5 @@ private:
     f32 m_Radius;
 
     MaterialHandle m_Material;
+    AABB m_BBox;
 };
