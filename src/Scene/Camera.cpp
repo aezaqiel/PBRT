@@ -43,48 +43,95 @@ std::vector<glm::vec3> Camera::Render(usize samples, usize depth) const
         return buffer;
     }
 
+    constexpr usize TILE_SIZE = 32;
+
+    usize numTilesX = (m_Width + TILE_SIZE - 1) / TILE_SIZE;
+    usize numTilexY = (m_Height + TILE_SIZE - 1) / TILE_SIZE;
+    usize totalTiles = numTilesX * numTilexY;
+    usize tilesProcessed = 0;
+
     std::println("Rendering:");
     std::println(" - Resolution: {}, {}", m_Width, m_Height);
+    std::println(" - Tiles: {} ({}x{})", totalTiles, TILE_SIZE, TILE_SIZE);
     std::println(" - Samples: {}", samples);
     std::println(" - Depth: {}", depth);
 
     auto start = std::chrono::steady_clock::now();
 
-    for (usize j = 0; j < m_Height; ++j) {
-        constexpr i32 barWidth = 50;
-        f32 progress = static_cast<f32>(j) / static_cast<f32>(m_Height);
-        i32 pos = static_cast<i32>(barWidth * progress);
+    for (usize ty = 0; ty < numTilexY; ++ty) {
+        for (usize tx = 0; tx < numTilesX; ++tx) {
+            usize xStart = tx * TILE_SIZE;
+            usize yStart = ty * TILE_SIZE;
 
-        std::print(std::clog, "\r[");
-        for (i32 b = 0; b < barWidth; ++b) {
-            if (b < pos) std::print(std::clog, "=");
-            else if (b == pos) std::print(std::clog, ">");
-            else std::print(std::clog, " ");
-        }
-        std::print(std::clog, "] {} %", static_cast<int>(progress * 100.0f));
-        std::clog << std::flush;
+            usize xEnd = std::min(xStart + TILE_SIZE, m_Width);
+            usize yEnd = std::min(yStart + TILE_SIZE, m_Height);
 
-        for (usize i = 0; i < m_Width; ++i) {
-            glm::vec3 color(0.0f);
+            for (usize j = yStart; j < yEnd; ++j) {
+                for (usize i = xStart; i < xEnd; ++i) {
+                    glm::vec3 color(0.0f);
 
-            for (usize s = 0; s < samples; ++s) {
-                Ray ray = GetRay(i, j);
-                color += RayColor(ray, depth);
+                    for (usize s = 0; s < samples; ++s) {
+                        color += RayColor(GetRay(i, j), depth);
+                    }
+
+                    color /= static_cast<f32>(samples);
+                    buffer[i + j * m_Width] = color;
+                }
             }
 
-            color /= static_cast<f32>(samples);
-            buffer[i + j * m_Width] = color;
+            tilesProcessed++;
+            constexpr i32 barWidth = 50;
+            f32 progress = static_cast<f32>(tilesProcessed) / static_cast<f32>(totalTiles);
+            i32 pos = static_cast<i32>(barWidth * progress);
+
+            std::print(std::clog, "\r[");
+            for (i32 b = 0; b < barWidth; ++b) {
+                if (b < pos) std::print(std::clog, "=");
+                else if (b == pos) std::print(std::clog, ">");
+                else std::print(std::clog, " ");
+            }
+            std::print(std::clog, "] {} %", static_cast<i32>(progress * 100.0f));
+            std::clog << std::flush;
         }
     }
 
-    std::println(std::clog, "\r[==================================================] 100 %\nDone.");
+    std::println(std::clog, "\r[==================================================] 100 %");
 
     auto end = std::chrono::steady_clock::now();
 
-    std::chrono::duration<f32> duration = end - start;
-    f32 seconds = duration.count();
+    std::chrono::duration<f64> duration = end - start;
+    f64 seconds = duration.count();
 
-    std::println("Render time: {:.2f} s", seconds);
+    std::string timeStr;
+    if (seconds < 60.0) {
+        timeStr = std::format("{:.2f} s", seconds);
+    } else if (seconds < 3600.0) {
+        u64 m = static_cast<u64>(seconds) / 60;
+        f64 s = seconds - static_cast<f64>(m * 60);
+        timeStr = std::format("{} m {:.2f} s", m, s);
+    } else {
+        u64 h = static_cast<u64>(seconds) / 3600;
+        u64 m = (static_cast<u64>(seconds) % 3600) / 60;
+        f64 s = seconds - static_cast<f64>(h * 3600 + m * 60);
+        timeStr = std::format("{} h {} m {:.2f} s", h, m, s);
+    }
+
+    u64 totalPrimaryRays = static_cast<u64>(m_Width) * m_Height * samples;
+    f64 raysPerSec = totalPrimaryRays / seconds;
+
+    std::string throughputStr;
+    if (raysPerSec >= 1.0e6) {
+        throughputStr = std::format("{:.2f} M", raysPerSec / 1.0e6);
+    } else if (raysPerSec >= 1.0e3) {
+        throughputStr = std::format("{:.2f} k", raysPerSec / 1.0e3);
+    } else {
+        throughputStr = std::format("{:.2f} ", raysPerSec);
+    }
+
+    std::println("Performance Metrics:");
+    std::println(" - Duration:   {}", timeStr);
+    std::println(" - Throughput: {} primary rays/s", throughputStr);
+    std::println(" - Total Rays: {}", totalPrimaryRays);
 
     return buffer;
 }
