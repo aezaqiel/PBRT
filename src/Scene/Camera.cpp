@@ -48,45 +48,34 @@ std::vector<glm::vec3> Camera::Render(usize samples, usize depth) const
     std::println(" - Samples: {}", samples);
     std::println(" - Depth: {}", depth);
 
-    std::vector<usize> vertical(m_Height);
-    std::iota(vertical.begin(), vertical.end(), 0);
-
-    std::mutex progressMutex;
-    std::atomic<usize> completedLines = 0;
-
     auto start = std::chrono::steady_clock::now();
 
-    std::for_each(std::execution::par, vertical.begin(), vertical.end(),
-        [this, samples, depth, &buffer, &progressMutex, &completedLines](usize j) {
-            for (usize i = 0; i < m_Width; ++i) {
-                glm::vec3 color(0.0f);
+    for (usize j = 0; j < m_Height; ++j) {
+        constexpr i32 barWidth = 50;
+        f32 progress = static_cast<f32>(j) / static_cast<f32>(m_Height);
+        i32 pos = static_cast<i32>(barWidth * progress);
 
-                for (usize s = 0; s < samples; ++s) {
-                    Ray ray = GetRay(i, j);
-                    color += RayColor(ray, depth);
-                }
-
-                color /= static_cast<f32>(samples);
-                buffer[i + j * m_Width] = color;
-            }
-
-            std::scoped_lock<std::mutex> lock(progressMutex);
-            usize finished = ++completedLines;
-
-            constexpr i32 barWidth = 50;
-            f32 progress = static_cast<f32>(finished) / static_cast<f32>(m_Height);
-            i32 pos = static_cast<i32>(barWidth * progress);
-
-            std::print(std::clog, "\r[");
-            for (int b = 0; b < barWidth; ++b) {
-                if (b < pos) std::print(std::clog, "=");
-                else if (b == pos) std::print(std::clog, ">");
-                else std::print(std::clog, " ");
-            }
-            std::print(std::clog, "] {} %", static_cast<int>(progress * 100.0f));
-            std::clog << std::flush;
+        std::print(std::clog, "\r[");
+        for (i32 b = 0; b < barWidth; ++b) {
+            if (b < pos) std::print(std::clog, "=");
+            else if (b == pos) std::print(std::clog, ">");
+            else std::print(std::clog, " ");
         }
-    );
+        std::print(std::clog, "] {} %", static_cast<int>(progress * 100.0f));
+        std::clog << std::flush;
+
+        for (usize i = 0; i < m_Width; ++i) {
+            glm::vec3 color(0.0f);
+
+            for (usize s = 0; s < samples; ++s) {
+                Ray ray = GetRay(i, j);
+                color += RayColor(ray, depth);
+            }
+
+            color /= static_cast<f32>(samples);
+            buffer[i + j * m_Width] = color;
+        }
+    }
 
     std::println(std::clog, "\r[==================================================] 100 %\nDone.");
 

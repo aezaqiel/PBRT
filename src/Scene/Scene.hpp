@@ -32,6 +32,7 @@ public:
 
     bool Hit(const Ray& ray, Interval clip, HitRecord& record) const;
 
+    static std::unique_ptr<Scene> TestScene();
     static std::unique_ptr<Scene> RandomSpheres();
 
 private:

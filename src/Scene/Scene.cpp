@@ -24,31 +24,54 @@ bool Scene::Hit(const Ray& ray, Interval clip, HitRecord& record) const
     return hit;
 }
 
+std::unique_ptr<Scene> Scene::TestScene()
+{
+    std::unique_ptr<Scene> scene = std::make_unique<Scene>();
+
+    scene->Push<Sphere>(
+        glm::vec3(0.0f, -100.5f, -1.0f), 100.0f,
+        scene->CreateMaterial<Lambertian>(glm::vec3(0.5f, 0.5f, 0.5f))
+    );
+
+    scene->Push<Sphere>(
+        glm::vec3(0.0f, 0.0f, -1.2f), 0.5f,
+        scene->CreateMaterial<Lambertian>(glm::vec3(0.4f, 0.2f, 0.1f))
+    );
+
+    scene->Push<Sphere>(
+        glm::vec3(-1.0f, 0.0f, -1.0f), 0.5f,
+        scene->CreateMaterial<Dielectric>(1.5f)
+    );
+
+    scene->Push<Sphere>(
+        glm::vec3( 1.0f, 0.0f, -1.0f), 0.5f,
+        scene->CreateMaterial<Metal>(glm::vec3(0.7f, 0.6f, 0.5f), 0.0)
+    );
+
+    return std::move(scene);
+}
+
 std::unique_ptr<Scene> Scene::RandomSpheres()
 {
     std::unique_ptr<Scene> scene = std::make_unique<Scene>();
 
     scene->Push<Sphere>(
-        glm::vec3(0.0f, -1000.0f, 0.0f),
-        1000.0f,
+        glm::vec3(0.0f, -1000.0f, 0.0f), 1000.0f,
         scene->CreateMaterial<Lambertian>(glm::vec3(0.5f, 0.5f, 0.5f))
     );
 
     scene->Push<Sphere>(
-        glm::vec3(0.0f, 1.0f, 0.0f),
-        1.0f,
+        glm::vec3(0.0f, 1.0f, 0.0f), 1.0f,
         scene->CreateMaterial<Dielectric>(1.5f)
     );
 
     scene->Push<Sphere>(
-        glm::vec3(-4.0f, 1.0f, 0.0f),
-        1.0f,
+        glm::vec3(-4.0f, 1.0f, 0.0f), 1.0f,
         scene->CreateMaterial<Lambertian>(glm::vec3(0.4f, 0.2f, 0.1f))
     );
 
     scene->Push<Sphere>(
-        glm::vec3(4.0f, 1.0f, 0.0f),
-        1.0f,
+        glm::vec3(4.0f, 1.0f, 0.0f), 1.0f,
         scene->CreateMaterial<Metal>(glm::vec3(0.7f, 0.6f, 0.5f), 0.0)
     );
 

@@ -22,24 +22,25 @@ namespace {
 
 int main()
 {
-    constexpr usize IMAGE_WIDTH = 3840;
-    constexpr usize IMAGE_HEIGHT = 2160;
-    constexpr usize SAMPLES = 1024;
-    constexpr usize DEPTH = 64;
+    constexpr usize IMAGE_WIDTH = 400;
+    constexpr usize IMAGE_HEIGHT = 300;
+    constexpr usize SAMPLES = 32;
+    constexpr usize DEPTH = 8;
 
 	constexpr f32 INV_GAMMA = 1.0f / 2.2f;
 
 	std::string outputFile = (std::filesystem::path(PathConfig::OutputDir) / "image.png").string();
 
-	auto scene = Scene::RandomSpheres();
+	// auto scene = Scene::RandomSpheres();
+	auto scene = Scene::TestScene();
 
 	std::unique_ptr<Camera> camera = std::make_unique<Camera>(
 		IMAGE_WIDTH, IMAGE_HEIGHT,
-		20.0f,
-		glm::vec3(13.0f, 2.0f, 3.0f),
-		glm::vec3(0.0f, 0.0f, 0.0f),
-		0.6f,
+		90.0f,
+		glm::vec3(-2.0f, 2.0f, 1.0f),
+		glm::vec3(0.0f, 0.0f, -1.0f),
 		10.0f,
+		3.4f,
 		Interval(0.001f, std::numeric_limits<f32>::infinity())
 	);
 
