@@ -4,16 +4,7 @@
 #include "Containers/Interval.hpp"
 #include "Containers/AABB.hpp"
 
-struct MaterialHandle
-{
-    // 0 index should be the default material
-    usize index { 0 };
-
-    MaterialHandle(usize index = 0)
-        : index(index)
-    {
-    }
-};
+class Material;
 
 struct HitRecord
 {
@@ -22,7 +13,7 @@ struct HitRecord
     f32 t;
     bool frontFace;
 
-    MaterialHandle material;
+    std::shared_ptr<Material> material;
 
     void SetFace(const Ray& ray, const glm::vec3& outNormal)
     {

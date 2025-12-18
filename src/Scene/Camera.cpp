@@ -164,9 +164,7 @@ glm::vec3 Camera::RayColor(Ray ray, usize depth) const
 
         auto hit = m_Scene->Hit(ray, m_Clip);
         if (hit) {
-            const auto& material = m_Scene->GetMaterial(hit->material);
-            auto scatter = material.Scatter(ray, *hit);
-
+            auto scatter = hit->material->Scatter(ray, *hit);
             if (scatter) {
                 auto [attenuation, scattered] = *scatter;
                 accumulated *= attenuation;

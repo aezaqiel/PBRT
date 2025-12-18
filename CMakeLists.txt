@@ -36,6 +36,10 @@ add_executable(${PROJECT_NAME}
     src/Hittables/Hittable.hpp
     src/Hittables/Sphere.hpp
     src/Hittables/Sphere.cpp
+    src/Hittables/AccelerationStructure/AccelerationStructure.hpp
+    src/Hittables/AccelerationStructure/AccelerationStructure.cpp
+    src/Hittables/AccelerationStructure/BVH.hpp
+    src/Hittables/AccelerationStructure/BVH.cpp
 
     src/Materials/Material.hpp
     src/Materials/Lambertian.hpp
@@ -47,7 +51,6 @@ add_executable(${PROJECT_NAME}
 
     src/Scene/Camera.hpp
     src/Scene/Camera.cpp
-    src/Scene/BVHNode.hpp
     src/Scene/Scene.hpp
     src/Scene/Scene.cpp
 
