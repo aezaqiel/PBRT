@@ -67,9 +67,14 @@ std::optional<HitRecord> BVH::Hit(const Ray& ray, const Interval& clip) const
 
 void BVH::Build()
 {
-    m_Nodes.clear();
     if (m_Primitives.empty()) return;
 
+    m_BBox = AABB();
+    for (const auto& prim : m_Primitives) {
+        m_BBox = AABB(m_BBox, prim->BBox());
+    }
+
+    m_Nodes.clear();
     m_Nodes.reserve(m_Primitives.size() * 2);
 
     BVHNode& root = m_Nodes.emplace_back();
