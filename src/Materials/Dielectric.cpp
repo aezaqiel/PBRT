@@ -18,26 +18,25 @@ Dielectric::Dielectric(f32 ri)
 {
 }
 
-bool Dielectric::Scatter(const Ray& ray, const HitRecord& record, glm::vec3& attenuation, Ray& scattered) const
+std::optional<std::pair<glm::vec3, Ray>> Dielectric::Scatter(const Ray& ray, const HitRecord& hit) const
 {
-    attenuation = glm::vec3(1.0f);
-
-    f32 ri = record.frontFace ? (1.0f / m_RefractionIndex) : m_RefractionIndex;
+    f32 ri = hit.frontFace ? (1.0f / m_RefractionIndex) : m_RefractionIndex;
 
     glm::vec3 unitDir = glm::normalize(ray.direction);
-    f32 cosTheta = std::fmin(glm::dot(-unitDir, record.normal), 1.0f);
+    f32 cosTheta = std::fmin(glm::dot(-unitDir, hit.normal), 1.0f);
     f32 sinTheta = std::sqrtf(1.0f - cosTheta * cosTheta);
 
     bool cannotRefract = ri * sinTheta > 1.0f;
     glm::vec3 direction;
 
     if (cannotRefract || Reflectance(cosTheta, ri) > Random::Float32()) {
-        direction = glm::reflect(unitDir, record.normal);
+        direction = glm::reflect(unitDir, hit.normal);
     } else {
-        direction = glm::refract(unitDir, record.normal, ri);
+        direction = glm::refract(unitDir, hit.normal, ri);
     }
 
-    scattered = Ray(record.p, direction, ray.time);
+    Ray scattered(hit.p, direction, ray.time);
+    glm::vec3 attenuation(1.0f);
 
-    return true;
+    return std::optional(std::make_pair(attenuation, scattered));
 }

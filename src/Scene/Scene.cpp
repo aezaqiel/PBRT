@@ -1,13 +1,13 @@
 #include "Scene.hpp"
 
+#include "Hittables/Sphere.hpp"
+#include "Materials/Lambertian.hpp"
+#include "Materials/Metal.hpp"
+#include "Materials/Dielectric.hpp"
+
 #include "Core/Rng.hpp"
 
 namespace {
-
-    AABB GetPrimBox(const PrimitiveVariant& prim)
-    {
-        return std::visit([](const auto& p) { return p.BBox(); }, prim);
-    }
 
     glm::vec3 GetCentroid(const AABB& box)
     {
@@ -22,12 +22,14 @@ namespace {
 Scene::Scene()
 {
     // Default material
-    m_Materials.push_back(Lambertian(glm::vec3(1.0f, 0.0f, 1.0f)));
+    m_Materials.push_back(std::make_unique<Lambertian>(glm::vec3(1.0f, 0.0f, 1.0f)));
 }
 
-bool Scene::Hit(const Ray& ray, Interval clip, HitRecord& record) const
+std::optional<HitRecord> Scene::Hit(const Ray& ray, Interval clip) const
 {
-    if (m_Nodes.empty()) return false;
+    if (m_Nodes.empty()) return std::nullopt;
+
+    HitRecord record;
     bool hitAnything = false;
 
     struct StackItem { u32 index; };
@@ -46,17 +48,12 @@ bool Scene::Hit(const Ray& ray, Interval clip, HitRecord& record) const
 
         if (node.primCount > 0) {
             for (u32 i = 0; i < node.primCount; ++i) {
-                const auto& primitive = m_Primitives[node.leftFirst + i];
-                HitRecord scratch;
-
-                bool hit = std::visit([&](const auto& prim) -> bool {
-                    return prim.Hit(ray, clip, scratch);
-                }, primitive);
-
+                const auto& hittable = m_Hittables[node.leftFirst + i];
+                auto hit = hittable->Hit(ray, clip);
                 if (hit) {
                     hitAnything = true;
-                    clip.max = scratch.t;
-                    record = scratch;
+                    clip.max = hit->t;
+                    record = *hit;
                 }
             }
         } else {
@@ -65,24 +62,28 @@ bool Scene::Hit(const Ray& ray, Interval clip, HitRecord& record) const
         }
     }
 
-    return hitAnything;
+    if (!hitAnything) {
+        return std::nullopt;
+    }
+
+    return record;
 }
 
 void Scene::Build()
 {
     m_Nodes.clear();
-    if (m_Primitives.empty()) return;
+    if (m_Hittables.empty()) return;
 
-    m_Nodes.reserve(m_Primitives.size() * 2);
+    m_Nodes.reserve(m_Hittables.size() * 2);
 
     BVHNode& root = m_Nodes.emplace_back();
     root.leftFirst = 0;
-    root.primCount = static_cast<u32>(m_Primitives.size());
+    root.primCount = static_cast<u32>(m_Hittables.size());
     root.bbox = m_BBox;
 
-    BuildRecursive(0, 0, static_cast<u32>(m_Primitives.size()));
+    BuildRecursive(0, 0, static_cast<u32>(m_Hittables.size()));
 
-    std::println("BVH built: {} nodes for {} primitives", m_Nodes.size(), m_Primitives.size());
+    std::println("BVH built: {} nodes for {} hittables", m_Nodes.size(), m_Hittables.size());
 }
 
 std::unique_ptr<Scene> Scene::TestScene()
@@ -178,7 +179,7 @@ void Scene::BuildRecursive(u32 nodeIdx, u32 start, u32 end)
     if (count <= 4) {
         AABB leaf;
         for (u32 i = start; i < end; ++i) {
-            leaf = AABB(leaf, GetPrimBox(m_Primitives[i]));
+            leaf = AABB(leaf, m_Hittables[i]->BBox());
         }
 
         m_Nodes[nodeIdx].bbox = leaf;
@@ -190,7 +191,7 @@ void Scene::BuildRecursive(u32 nodeIdx, u32 start, u32 end)
 
     AABB centroid;
     for (u32 i = start; i < end; ++i) {
-        glm::vec3 c = GetCentroid(GetPrimBox(m_Primitives[i]));
+        glm::vec3 c = GetCentroid(m_Hittables[i]->BBox());
         AABB cb(c, c);
         centroid = AABB(cb, centroid);
     }
@@ -202,20 +203,20 @@ void Scene::BuildRecursive(u32 nodeIdx, u32 start, u32 end)
 
     f32 mid = (centroid.AxisInterval(axis).min + centroid.AxisInterval(axis).max) * 0.5f;
 
-    auto it = std::partition(m_Primitives.begin() + start, m_Primitives.begin() + end,
-        [&](const PrimitiveVariant& p) {
-            glm::vec3 c = GetCentroid(GetPrimBox(p));
+    auto it = std::partition(m_Hittables.begin() + start, m_Hittables.begin() + end,
+        [&](const auto& obj) {
+            glm::vec3 c = GetCentroid(obj->BBox());
             return c[axis] < mid;
         }
     );
 
-    u32 splitIdx = static_cast<u32>(std::distance(m_Primitives.begin(), it));
+    u32 splitIdx = static_cast<u32>(std::distance(m_Hittables.begin(), it));
 
     if (splitIdx == start || splitIdx == end) {
         splitIdx = start + (count / 2);
-        std::nth_element(m_Primitives.begin() + start, m_Primitives.begin() + splitIdx, m_Primitives.begin() + end,
-            [&](const PrimitiveVariant& a, const PrimitiveVariant& b) {
-                return GetCentroid(GetPrimBox(a))[axis] < GetCentroid(GetPrimBox(b))[axis];
+        std::nth_element(m_Hittables.begin() + start, m_Hittables.begin() + splitIdx, m_Hittables.begin() + end,
+            [&](const auto& a, const auto& b) {
+                return GetCentroid(a->BBox())[axis] < GetCentroid(b->BBox())[axis];
             }
         );
     }

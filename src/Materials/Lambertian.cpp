@@ -7,17 +7,17 @@ Lambertian::Lambertian(const glm::vec3& albedo)
 {
 }
 
-bool Lambertian::Scatter(const Ray& ray, const HitRecord& record, glm::vec3& attenuation, Ray& scattered) const
+std::optional<std::pair<glm::vec3, Ray>> Lambertian::Scatter(const Ray& ray, const HitRecord& hit) const
 {
-    glm::vec3 direction = record.normal + Random::UnitVec3f();
+    glm::vec3 direction = hit.normal + Random::UnitVec3f();
 
     constexpr f32 epsilon = std::numeric_limits<f32>::epsilon();
     if (glm::abs(direction.x) < epsilon && glm::abs(direction.y) < epsilon && glm::abs(direction.z) < epsilon) {
-        direction = record.normal;
+        direction = hit.normal;
     }
 
-    scattered = Ray(record.p, direction, ray.time);
-    attenuation = m_Albedo;
+    glm::vec3 attenuation(m_Albedo);
+    Ray scattered(hit.p, direction, ray.time);
 
-    return true;
+    return std::optional(std::make_pair(attenuation, scattered));
 }

@@ -1,11 +1,8 @@
 #pragma once
 
-#include "HitRecord.hpp"
+#include "Hittable.hpp"
 
-#include "Containers/AABB.hpp"
-#include "Containers/Interval.hpp"
-
-class Sphere
+class Sphere final : public Hittable
 {
 public:
     Sphere(const glm::vec3& center, f32 radius, MaterialHandle material = MaterialHandle());
@@ -13,9 +10,9 @@ public:
 
     ~Sphere() = default;
 
-    inline AABB BBox() const { return m_BBox; }
+    inline virtual AABB BBox() const override { return m_BBox; }
 
-    bool Hit(const Ray& ray, Interval t, HitRecord& record) const;
+    virtual std::optional<HitRecord> Hit(const Ray& ray, const Interval& clip) const override;
 
 private:
     Ray m_Center;

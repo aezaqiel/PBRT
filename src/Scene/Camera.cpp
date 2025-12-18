@@ -162,15 +162,13 @@ glm::vec3 Camera::RayColor(Ray ray, usize depth) const
     for (usize i = 0; i < depth; ++i) {
         HitRecord record;
 
-        if (m_Scene->Hit(ray, m_Clip, record)) {
-            glm::vec3 attenuation;
-            Ray scattered;
-
-            bool scatter = std::visit([&](const auto& mat) -> bool {
-                return mat.Scatter(ray, record, attenuation, scattered);
-            }, m_Scene->GetMaterial(record.material));
+        auto hit = m_Scene->Hit(ray, m_Clip);
+        if (hit) {
+            const auto& material = m_Scene->GetMaterial(hit->material);
+            auto scatter = material.Scatter(ray, *hit);
 
             if (scatter) {
+                auto [attenuation, scattered] = *scatter;
                 accumulated *= attenuation;
                 ray = scattered;
             } else {

@@ -1,15 +1,14 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include "Material.hpp"
 
-#include "Primitives/HitRecord.hpp"
-#include "Containers/Ray.hpp"
-
-class Lambertian
+class Lambertian final : public Material
 {
 public:
     Lambertian(const glm::vec3& albedo);
+    virtual ~Lambertian() = default;
 
+    virtual std::optional<std::pair<glm::vec3, Ray>> Scatter(const Ray& ray, const HitRecord& hit) const override;
     bool Scatter(const Ray& ray, const HitRecord& record, glm::vec3& attenuation, Ray& scattered) const;
 
 private:

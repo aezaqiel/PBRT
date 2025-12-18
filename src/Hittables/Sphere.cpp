@@ -16,7 +16,7 @@ Sphere::Sphere(const glm::vec3& c0, const glm::vec3& c1, f32 radius, MaterialHan
     m_BBox = AABB(box1, box2);
 }
 
-bool Sphere::Hit(const Ray& ray, Interval t, HitRecord& record) const
+std::optional<HitRecord> Sphere::Hit(const Ray& ray, const Interval& clip) const
 {
     glm::vec3 center = m_Center.At(ray.time);
 
@@ -29,24 +29,26 @@ bool Sphere::Hit(const Ray& ray, Interval t, HitRecord& record) const
     f32 discriminant = halfB * halfB - a * c;
 
     if (discriminant < 0.0f) {
-        return false;
+        return std::nullopt;
     }
 
     f32 sqrtd = glm::sqrt(discriminant);
 
     f32 root = (-halfB - sqrtd) / a;
 
-    if (!t.Surrounds(root)) {
+    if (!clip.Surrounds(root)) {
         root = (-halfB + sqrtd) / a;
-        if (!t.Surrounds(root)) {
-            return false;
+        if (!clip.Surrounds(root)) {
+            return std::nullopt;
         }
     }
 
+    HitRecord record;
     record.t = root;
     record.p = ray.At(root);
-    record.SetFace(ray, (record.p - center) / m_Radius);
     record.material = m_Material;
 
-    return true;
+    record.SetFace(ray, (record.p - center) / m_Radius);
+
+    return record;
 }

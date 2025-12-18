@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Containers/Ray.hpp"
+#include "Containers/Interval.hpp"
+#include "Containers/AABB.hpp"
 
 struct MaterialHandle
 {
@@ -28,3 +30,14 @@ struct HitRecord
         normal = frontFace ? outNormal : -outNormal;
     }
 };
+
+class Hittable
+{
+public:
+    virtual ~Hittable() = default;
+    virtual std::optional<HitRecord> Hit(const Ray& ray, const Interval& clip) const = 0;
+    virtual AABB BBox() const = 0;
+};
+
+template <typename T>
+concept IsHittable = std::is_base_of_v<Hittable, T>;

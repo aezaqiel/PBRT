@@ -33,10 +33,9 @@ add_executable(${PROJECT_NAME}
     src/Containers/AABB.hpp
     src/Containers/AABB.cpp
 
-    src/Primitives/Primitive.hpp
-    src/Primitives/HitRecord.hpp
-    src/Primitives/Sphere.hpp
-    src/Primitives/Sphere.cpp
+    src/Hittables/Hittable.hpp
+    src/Hittables/Sphere.hpp
+    src/Hittables/Sphere.cpp
 
     src/Materials/Material.hpp
     src/Materials/Lambertian.hpp

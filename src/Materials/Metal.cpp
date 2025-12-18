@@ -7,13 +7,17 @@ Metal::Metal(const glm::vec3& albedo, f32 fuzz)
 {
 }
 
-bool Metal::Scatter(const Ray& ray, const HitRecord& record, glm::vec3& attenuation, Ray& scattered) const
+std::optional<std::pair<glm::vec3, Ray>> Metal::Scatter(const Ray& ray, const HitRecord& hit) const
 {
-    glm::vec3 reflected = glm::reflect(ray.direction, record.normal);
+    glm::vec3 reflected = glm::reflect(ray.direction, hit.normal);
     reflected = glm::normalize(reflected) + (m_Fuzz * Random::UnitVec3f());
 
-    scattered = Ray(record.p, reflected, ray.time);
-    attenuation = m_Albedo;
+    Ray scattered(hit.p, reflected, ray.time);
+    glm::vec3 attenuation(m_Albedo);
 
-    return glm::dot(scattered.direction, record.normal) > 0;
+    if (glm::dot(scattered.direction, hit.normal) <= 0) {
+        return std::nullopt;
+    }
+
+    return std::optional(std::make_pair(attenuation, scattered));
 }

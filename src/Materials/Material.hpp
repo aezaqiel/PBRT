@@ -1,22 +1,13 @@
 #pragma once
 
-#include "Primitives/HitRecord.hpp"
+#include "Hittables/Hittable.hpp"
 
-#include "Lambertian.hpp"
-#include "Metal.hpp"
-#include "Dielectric.hpp"
-
-using MaterialVariant = std::variant<
-    Lambertian,
-    Metal,
-    Dielectric
->;
-
-template <typename T>
-concept Scatterable = requires(const T& t, const Ray& r, const HitRecord& rec, glm::vec3& att, Ray& scat)
+class Material
 {
-    { t.Scatter(r, rec, att, scat) } -> std::convertible_to<bool>;
+public:
+    virtual ~Material() = default;
+    virtual std::optional<std::pair<glm::vec3, Ray>> Scatter(const Ray& ray, const HitRecord& hit) const = 0;
 };
 
 template <typename T>
-concept Material = IsVariantMember<T, MaterialVariant>::value && Scatterable<T>;
+concept IsMaterial = std::is_base_of_v<Material, T>;

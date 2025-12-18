@@ -2,8 +2,8 @@
 
 #include "BVHNode.hpp"
 
+#include "Hittables/Hittable.hpp"
 #include "Materials/Material.hpp"
-#include "Primitives/Primitive.hpp"
 
 #include "Containers/AABB.hpp"
 
@@ -12,33 +12,32 @@ class Scene
 public:
     Scene();
 
-    template <Material T, typename... Args>
+    template <IsMaterial T, typename... Args>
         requires std::constructible_from<T, Args...>
     inline MaterialHandle CreateMaterial(Args&&... args)
     {
-        m_Materials.emplace_back(T(std::forward<Args>(args)...));
+        m_Materials.push_back(std::make_unique<T>(std::forward<Args>(args)...));
         return MaterialHandle { m_Materials.size() - 1 };
     }
 
-    inline const MaterialVariant& GetMaterial(MaterialHandle handle) const
+    inline const Material& GetMaterial(MaterialHandle handle) const
     {
-        return m_Materials[handle.index];
+        return *m_Materials[handle.index];
     }
 
-    template <Primitive T, typename... Args>
+    template <IsHittable T, typename... Args>
         requires std::constructible_from<T, Args...>
     inline void Push(Args&&... args)
     {
-        T prim(std::forward<Args>(args)...);
-        m_Primitives.emplace_back(prim);
-        m_BBox = AABB(m_BBox, prim.BBox());
+        auto& obj = m_Hittables.emplace_back(std::make_unique<T>(std::forward<Args>(args)...));
+        m_BBox = AABB(m_BBox, obj->BBox());
     }
 
     inline AABB BBox() const { return m_BBox; }
 
     void Build();
 
-    bool Hit(const Ray& ray, Interval clip, HitRecord& record) const;
+    std::optional<HitRecord> Hit(const Ray& ray, Interval clip) const;
 
     static std::unique_ptr<Scene> TestScene();
     static std::unique_ptr<Scene> RandomSpheres();
@@ -47,8 +46,8 @@ private:
     void BuildRecursive(u32 nodeIdx, u32 start, u32 end);
 
 private:
-    std::vector<MaterialVariant> m_Materials;
-    std::vector<PrimitiveVariant> m_Primitives;
+    std::vector<std::unique_ptr<Hittable>> m_Hittables;
+    std::vector<std::unique_ptr<Material>> m_Materials;
 
     std::vector<BVHNode> m_Nodes;
 

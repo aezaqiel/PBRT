@@ -1,16 +1,14 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include "Material.hpp"
 
-#include "Primitives/HitRecord.hpp"
-#include "Containers/Ray.hpp"
-
-class Dielectric
+class Dielectric final : public Material
 {
 public:
     Dielectric(f32 ri);
+    virtual ~Dielectric() = default;
 
-    bool Scatter(const Ray& ray, const HitRecord& record, glm::vec3& attenuation, Ray& scattered) const;
+    virtual std::optional<std::pair<glm::vec3, Ray>> Scatter(const Ray& ray, const HitRecord& hit) const override;
 
 private:
     f32 m_RefractionIndex;

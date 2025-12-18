@@ -1,16 +1,14 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include "Material.hpp"
 
-#include "Primitives/HitRecord.hpp"
-#include "Containers/Ray.hpp"
-
-class Metal
+class Metal final : public Material
 {
 public:
     Metal(const glm::vec3& albedo, f32 fuzz);
+    virtual ~Metal() = default;
 
-    bool Scatter(const Ray& ray, const HitRecord& record, glm::vec3& attenuation, Ray& scattered) const;
+    virtual std::optional<std::pair<glm::vec3, Ray>> Scatter(const Ray& ray, const HitRecord& hit) const override;
 
 private:
     glm::vec3 m_Albedo;
