@@ -7,7 +7,7 @@ Lambertian::Lambertian(const glm::vec3& albedo)
 {
 }
 
-std::optional<std::pair<glm::vec3, Ray>> Lambertian::Scatter(const Ray& ray, const HitRecord& hit) const
+std::optional<ScatterRecord> Lambertian::Scatter(const Ray& ray, const HitRecord& hit) const
 {
     glm::vec3 direction = hit.normal + Random::UnitVec3f();
 
@@ -16,8 +16,8 @@ std::optional<std::pair<glm::vec3, Ray>> Lambertian::Scatter(const Ray& ray, con
         direction = hit.normal;
     }
 
-    glm::vec3 attenuation(m_Albedo);
-    Ray scattered(hit.p, direction, ray.time);
-
-    return std::optional(std::make_pair(attenuation, scattered));
+    return ScatterRecord {
+        .attenuation = m_Albedo,
+        .scattered = Ray(hit.p, direction, ray.time)
+    };
 }

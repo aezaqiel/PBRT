@@ -8,7 +8,7 @@ public:
     Metal(const glm::vec3& albedo, f32 fuzz);
     virtual ~Metal() = default;
 
-    virtual std::optional<std::pair<glm::vec3, Ray>> Scatter(const Ray& ray, const HitRecord& hit) const override;
+    virtual std::optional<ScatterRecord> Scatter(const Ray& ray, const HitRecord& hit) const override;
 
 private:
     glm::vec3 m_Albedo;

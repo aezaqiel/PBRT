@@ -18,7 +18,7 @@ Dielectric::Dielectric(f32 ri)
 {
 }
 
-std::optional<std::pair<glm::vec3, Ray>> Dielectric::Scatter(const Ray& ray, const HitRecord& hit) const
+std::optional<ScatterRecord> Dielectric::Scatter(const Ray& ray, const HitRecord& hit) const
 {
     f32 ri = hit.frontFace ? (1.0f / m_RefractionIndex) : m_RefractionIndex;
 
@@ -35,8 +35,8 @@ std::optional<std::pair<glm::vec3, Ray>> Dielectric::Scatter(const Ray& ray, con
         direction = glm::refract(unitDir, hit.normal, ri);
     }
 
-    Ray scattered(hit.p, direction, ray.time);
-    glm::vec3 attenuation(1.0f);
-
-    return std::optional(std::make_pair(attenuation, scattered));
+    return ScatterRecord {
+        .attenuation = glm::vec3(1.0f),
+        .scattered = Ray(hit.p, direction, ray.time)
+    };
 }

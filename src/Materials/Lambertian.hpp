@@ -8,7 +8,7 @@ public:
     Lambertian(const glm::vec3& albedo);
     virtual ~Lambertian() = default;
 
-    virtual std::optional<std::pair<glm::vec3, Ray>> Scatter(const Ray& ray, const HitRecord& hit) const override;
+    virtual std::optional<ScatterRecord> Scatter(const Ray& ray, const HitRecord& hit) const override;
     bool Scatter(const Ray& ray, const HitRecord& record, glm::vec3& attenuation, Ray& scattered) const;
 
 private:

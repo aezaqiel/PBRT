@@ -166,9 +166,8 @@ glm::vec3 Camera::RayColor(Ray ray, usize depth) const
         if (hit) {
             auto scatter = hit->material->Scatter(ray, *hit);
             if (scatter) {
-                auto [attenuation, scattered] = *scatter;
-                accumulated *= attenuation;
-                ray = scattered;
+                accumulated *= scatter->attenuation;
+                ray = scatter->scattered;
             } else {
                 return glm::vec3(0.0f);
             }

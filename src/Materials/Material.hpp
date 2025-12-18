@@ -2,11 +2,17 @@
 
 #include "Hittables/Hittable.hpp"
 
+struct ScatterRecord
+{
+    glm::vec3 attenuation;
+    Ray scattered;
+};
+
 class Material
 {
 public:
     virtual ~Material() = default;
-    virtual std::optional<std::pair<glm::vec3, Ray>> Scatter(const Ray& ray, const HitRecord& hit) const = 0;
+    virtual std::optional<ScatterRecord> Scatter(const Ray& ray, const HitRecord& hit) const = 0;
 };
 
 template <typename T>
